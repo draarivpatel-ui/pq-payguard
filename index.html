@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PQ PayGuard | Quantum Risk Gated tUSD8 Escrow on QDay Aevum</title>
+<meta name="description" content="A quantum exposure score bound into a tUSD8 escrow on QDay Aevum testnet chain 44005. The score selects the release path on chain: instant, timelocked, guardian co-signed or quarantined.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="styles.css">
+<script>
+window.__pqpgErrors = [];
+window.__pqpgFetch = [];
+window.addEventListener('error', function (e) {
+  window.__pqpgErrors.push(String(e.message || e));
+});
+window.addEventListener('unhandledrejection', function (e) {
+  window.__pqpgErrors.push('rejection:' + String(e.reason && e.reason.message || e.reason));
+});
+if (window.fetch) {
+  var __f = window.fetch;
+  window.fetch = function () {
+    window.__pqpgFetch.push(String(arguments[0] && arguments[0].url || arguments[0]));
+    return __f.apply(this, arguments);
+  };
+}
+</script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<div id="a11y-live" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+
+<header class="site-head">
+  <div class="wrap head-inner">
+    <a class="brand" href="./">
+      <span class="brand-mark" aria-hidden="true">PG</span>
+      <span class="brand-text">PQ<span class="brand-dim">PayGuard</span></span>
+    </a>
+    <nav class="head-nav" aria-label="Sections">
+      <a href="#score">Score</a>
+      <a href="#sim">Simulator</a>
+      <a href="#network">Testnet</a>
+      <a href="#docs">Docs</a>
+    </nav>
+    <button id="theme-toggle" class="theme-btn" type="button" aria-label="Toggle light or dark theme">Light</button>
+  </div>
+</header>
+
+<main class="wrap" id="main">
+
+  <section class="hero">
+    <div class="hero-copy">
+      <h1>The risk score gates the release. On chain.</h1>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="#score">Score a payment</a>
+        <a class="btn btn-ghost" href="#sim">Run the simulator</a>
+      </div>
+      <div class="hero-stats" role="group" aria-label="Project facts">
+        <div class="stat"><span class="stat-num">44005</span><span class="stat-label">Aevum chain id</span></div>
+        <div class="stat"><span class="stat-num">4</span><span class="stat-label">release tiers</span></div>
+        <div class="stat"><span class="stat-num">6</span><span class="stat-label">tUSD8 decimals</span></div>
+        <div class="stat"><span class="stat-num">0</span><span class="stat-label">runtime dependencies</span></div>
+      </div>
+    </div>
+    <div class="hero-panel" aria-label="Risk gate summary">
+      <table class="gate-table">
+        <thead>
+          <tr><th>Score</th><th>Tier</th><th>Release path</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>0 - 29</code></td><td><span class="tier tier-low">low</span></td><td>instant release to recipient</td></tr>
+          <tr><td><code>30 - 59</code></td><td><span class="tier tier-med">medium</span></td><td>timelock delay, payer may revoke first</td></tr>
+          <tr><td><code>60 - 84</code></td><td><span class="tier tier-high">high</span></td><td>extended timelock plus guardian co-sign</td></tr>
+          <tr><td><code>85 - 100</code></td><td><span class="tier tier-crit">critical</span></td><td>quarantined, payer reclaims</td></tr>
+        </tbody>
+      </table>
+      <p class="panel-note">Every tier boundary is enforced by the contract, not by metadata. The commitment hash binds the score before funds move.</p>
+    </div>
+  </section>
+
+  <!-- ============ Risk scoring ============ -->
+  <section id="score" class="panel">
+    <div class="panel-head">
+      <h2>Quantum exposure score</h2>
+      <p>A deterministic additive model rates the receiving scheme. Factors feed the same tier table the contract enforces.</p>
+    </div>
+    <div class="grid-2">
+      <form id="score-form" class="form" autocomplete="off">
+        <label>Receiving signature scheme
+          <select id="in-scheme"></select>
+        </label>
+        <div class="form-row">
+          <label>Route value (tUSD8)
+            <input id="in-value" type="number" min="0" step="any" value="1500">
+          </label>
+          <label>Key age (days)
+            <input id="in-age" type="number" min="0" step="1" value="400">
+          </label>
+        </div>
+        <div class="check-row">
+          <label class="check"><input id="in-revealed" type="checkbox" checked> public key already revealed on chain</label>
+          <label class="check"><input id="in-deprecated" type="checkbox"> scheme flagged deprecated</label>
+        </div>
+      </form>
+      <div class="score-out">
+        <div class="score-ring">
+          <span class="score-num" id="score-num">0</span>
+          <span class="score-tier" id="score-tier">low</span>
+        </div>
+        <ul class="factor-list" id="factor-list"></ul>
+      </div>
+    </div>
+
+    <div class="panel-head sub">
+      <h3>Escrow parameters</h3>
+      <p>Fill in the payment context. The attestation hash, the on-chain style commitment and the exact <code>createEscrow</code> calldata are computed locally.</p>
+    </div>
+    <div class="grid-2">
+      <form id="escrow-form" class="form" autocomplete="off">
+        <div class="form-row">
+          <label>Escrow contract address
+            <input id="in-contract" type="text" spellcheck="false" placeholder="0x...">
+          </label>
+          <label>Session id
+            <input id="in-session" type="number" min="0" step="1" value="0">
+          </label>
+        </div>
+        <div class="form-row">
+          <label>Payer address
+            <input id="in-payer" type="text" spellcheck="false" value="0x0000000000000000000000000000000000000Aa1">
+          </label>
+          <label>Recipient address
+            <input id="in-recipient" type="text" spellcheck="false" value="0x0000000000000000000000000000000000000Bb2">
+          </label>
+        </div>
+        <div class="form-row">
+          <label>Amount (tUSD8, 6 decimals)
+            <input id="in-amount" type="text" spellcheck="false" value="250.5">
+          </label>
+          <label>Deadline (hours from now)
+            <input id="in-deadline" type="number" min="1" step="1" value="24">
+          </label>
+        </div>
+        <p class="form-hint">Contract address defaults to a placeholder until a deployment exists. Change it and the commitment recomputes.</p>
+      </form>
+      <div class="hash-out">
+        <div class="hash-block">
+          <span class="hash-label">attestationHash (SHA-256, domain separated)</span>
+          <code class="hash-value" id="out-att">-</code>
+        </div>
+        <div class="hash-block">
+          <span class="hash-label">commitmentHash (keccak256 of on-chain preimage)</span>
+          <code class="hash-value" id="out-com">-</code>
+        </div>
+        <div class="hash-block">
+          <span class="hash-label">createEscrow calldata</span>
+          <code class="hash-value wrap" id="out-calldata">-</code>
+          <div class="btn-row">
+            <button class="btn btn-ghost sm" id="btn-copy-calldata" type="button">Copy calldata</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Simulator ============ -->
+  <section id="sim" class="panel">
+    <div class="panel-head">
+      <h2>Escrow state machine simulator</h2>
+      <p>A dependency free mirror of <code>PQPayGuardEscrow.sol</code>. Same branch order, same revert names, same tier gates. The <code>test/</code> suite checks it against real EVM bytecode.</p>
+    </div>
+
+    <div class="sim-bar">
+      <div class="sim-clock">
+        <span class="sim-clock-label">simulated time</span>
+        <code id="sim-now">-</code>
+      </div>
+      <div class="sim-clock-ctl">
+        <label>advance
+          <select id="sim-warp">
+            <option value="60">1 min</option>
+            <option value="900" selected>15 min</option>
+            <option value="3600">1 hour</option>
+            <option value="14400">4 hours</option>
+            <option value="86400">1 day</option>
+          </select>
+        </label>
+        <button class="btn btn-ghost sm" id="btn-warp" type="button">Warp</button>
+      </div>
+      <div class="sim-actors">
+        <label>acting as
+          <select id="sim-actor"></select>
+        </label>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <form id="session-form" class="form" autocomplete="off">
+        <h3 class="form-title">New session policy</h3>
+        <div class="form-row">
+          <label>Max per escrow (tUSD8)
+            <input id="ses-max" type="text" spellcheck="false" value="500">
+          </label>
+          <label>Cumulative cap (tUSD8)
+            <input id="ses-cap" type="text" spellcheck="false" value="2000">
+          </label>
+        </div>
+        <div class="form-row">
+          <label>Medium delay (min)
+            <input id="ses-med" type="number" min="0" step="1" value="15">
+          </label>
+          <label>High delay (min)
+            <input id="ses-high" type="number" min="0" step="1" value="240">
+          </label>
+        </div>
+        <div class="form-row">
+          <label>Expiry (days)
+            <input id="ses-expiry" type="number" min="1" step="1" value="7">
+          </label>
+          <label>Guardian
+            <select id="ses-guardian"></select>
+          </label>
+        </div>
+        <div class="form-row">
+          <label>Operator (agent)
+            <select id="ses-operator"></select>
+          </label>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary sm" id="btn-session" type="submit">Create session</button>
+        </div>
+      </form>
+
+      <form id="sim-escrow-form" class="form" autocomplete="off">
+        <h3 class="form-title">New escrow</h3>
+        <div class="form-row">
+          <label>Session
+            <select id="esc-session"></select>
+          </label>
+          <label>Recipient
+            <select id="esc-recipient"></select>
+          </label>
+        </div>
+        <div class="form-row">
+          <label>Amount (tUSD8)
+            <input id="esc-amount" type="text" spellcheck="false" value="250.5">
+          </label>
+          <label>Deadline (hours)
+            <input id="esc-deadline" type="number" min="1" step="1" value="24">
+          </label>
+        </div>
+        <div class="form-row">
+          <label>Risk score override
+            <input id="esc-score" type="number" min="0" max="100" step="1" placeholder="use score panel">
+          </label>
+        </div>
+        <p class="form-hint" id="esc-score-hint">Leave blank to use the score computed above. The simulator mints demo tokens to the payer and computes the commitment for you.</p>
+        <div class="btn-row">
+          <button class="btn btn-primary sm" id="btn-escrow" type="submit">Fund escrow</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="sim-lists">
+      <div>
+        <h3 class="list-title">Sessions</h3>
+        <div id="session-list" class="card-list"></div>
+      </div>
+      <div>
+        <h3 class="list-title">Escrows</h3>
+        <div id="escrow-list" class="card-list"></div>
+      </div>
+    </div>
+
+    <div class="audit">
+      <div class="audit-head">
+        <h3 class="list-title">Audit trail</h3>
+        <button class="btn btn-ghost sm" id="btn-export" type="button">Export JSON</button>
+      </div>
+      <div class="audit-scroll">
+        <table class="audit-table">
+          <thead><tr><th>time</th><th>event</th><th>details</th></tr></thead>
+          <tbody id="audit-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Testnet ============ -->
+  <section id="network" class="panel">
+    <div class="panel-head">
+      <h2>QDay Aevum testnet</h2>
+      <p>Read only RPC inspection and wallet helpers. Nothing here runs until you press a button; a failed probe falls back to a clearly marked deterministic simulation.</p>
+    </div>
+
+    <div class="grid-2">
+      <div class="net-card">
+        <h3 class="form-title">RPC inspector</h3>
+        <div class="form-row">
+          <label>Account to check (optional)
+            <input id="rpc-account" type="text" spellcheck="false" placeholder="0x...">
+          </label>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary sm" id="btn-probe" type="button">Probe testnet</button>
+          <span class="net-status" id="probe-status">idle</span>
+        </div>
+        <dl class="kv" id="probe-out"></dl>
+      </div>
+
+      <div class="net-card">
+        <h3 class="form-title">Wallet</h3>
+        <div class="btn-row">
+          <button class="btn btn-primary sm" id="btn-connect" type="button">Connect wallet</button>
+          <button class="btn btn-ghost sm" id="btn-switch" type="button">Switch to Aevum</button>
+        </div>
+        <dl class="kv" id="wallet-out"></dl>
+        <h3 class="form-title">Deployed escrow reads</h3>
+        <div class="form-row">
+          <label>Contract address
+            <input id="live-contract" type="text" spellcheck="false" placeholder="0x...">
+          </label>
+          <label>Escrow id
+            <input id="live-escrow" type="number" min="0" step="1" value="0">
+          </label>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-ghost sm" id="btn-live-read" type="button">Read on chain</button>
+          <span class="net-status" id="live-status">idle</span>
+        </div>
+        <dl class="kv" id="live-out"></dl>
+      </div>
+    </div>
+
+    <table class="gate-table params">
+      <tbody>
+        <tr><td>network</td><td>QDay Aevum testnet</td><td>chain id <code>44005</code> / <code>0xabe5</code></td></tr>
+        <tr><td>rpc</td><td colspan="2"><code>https://rpc-test.qday.info</code></td></tr>
+        <tr><td>tUSD8</td><td colspan="2"><code class="wrap">0x456569838f1d43009A91ebA4263147Afd7233483</code> (6 decimals)</td></tr>
+        <tr><td>links</td><td colspan="2">
+          <a href="https://faucet.qday.info/en" rel="noopener">faucet</a>
+          <a href="https://explorer-test.qday.info" rel="noopener">explorer</a>
+          <a href="https://qday.io/official-links" rel="noopener">official links</a>
+        </td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ============ Docs ============ -->
+  <section id="docs" class="panel">
+    <div class="panel-head">
+      <h2>How the gate works</h2>
+    </div>
+    <div class="docs-grid">
+      <div class="doc-block">
+        <h3>Flow</h3>
+        <ol class="doc-list">
+          <li>The payer opens a session policy with a per payment cap, a cumulative cap, an expiry, tier delays and an optional operator agent plus a guardian.</li>
+          <li>Off chain, the route is scored 0 to 100. The attestation hash and the commitment hash are computed locally.</li>
+          <li><code>createEscrow</code> verifies the commitment on chain, so the stored score is provably the attested one, then pulls tUSD8 from the payer.</li>
+          <li>The tier picks the path. Low releases now, Medium waits for the session delay, High also needs the guardian signature, Critical never releases.</li>
+          <li>The payer can revoke any funded escrow at any moment. A paused or revoked session freezes pending releases; funds stay reclaimable.</li>
+        </ol>
+      </div>
+      <div class="doc-block">
+        <h3>Controls</h3>
+        <ul class="doc-list">
+          <li>Scoped session keys bound agent spend to caps and expiry.</li>
+          <li>Every state change emits an audit event for explorer verification.</li>
+          <li>Checks-effects-interactions ordering, a reentrancy lock and exact balance deltas guard the token flows.</li>
+          <li>The commitment binds chain id, contract, session, payer, recipient, amount, score, attestation and deadline.</li>
+        </ul>
+      </div>
+      <div class="doc-block">
+        <h3>Honest scope</h3>
+        <ul class="doc-list">
+          <li>Testnet only. tUSD8 has no monetary value and no tokens are issued or promised.</li>
+          <li>The score is a routing signal from a documented educational model. It is not a certified cryptanalysis.</li>
+          <li>The contract performs no post quantum signatures. QDay is EVM compatible today with a post quantum migration path.</li>
+          <li>Until a deployment exists, every on-chain read is opt in and every write stays inside the simulator.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-foot">
+    <p>PQ PayGuard runs entirely in this page. The only network call it can make is the one you ask for with the probe button.</p>
+  </footer>
+</main>
+
+<pre id="selftest-report" hidden></pre>
+<script src="src/keccak.js"></script>
+<script src="src/abi.js"></script>
+<script src="src/chain.js"></script>
+<script src="src/risk.js"></script>
+<script src="src/commit.js"></script>
+<script src="src/sim.js"></script>
+<script src="src/rpc.js"></script>
+<script src="src/wallet.js"></script>
+<script src="src/ui.js"></script>
+</body>
+</html>
