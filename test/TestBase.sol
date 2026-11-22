@@ -16,6 +16,7 @@ interface Vm {
     function assume(bool condition) external;
     function bound(uint256 x, uint256 min, uint256 max) external returns (uint256);
     function targetContract(address newTargetedContract) external;
+    function chainId(uint256 newChainId) external;
 }
 
 contract TestBase {

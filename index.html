@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PQ PayGuard | Quantum Risk Gated tUSD8 Escrow on QDay Aevum</title>
 <meta name="description" content="A quantum exposure score bound into a tUSD8 escrow on QDay Aevum testnet chain 44005. The score selects the release path on chain: instant, timelocked, guardian co-signed or quarantined.">
+<meta name="pqpg-build" content="v2-attacks-2026-11-22">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="styles.css">
 <script>
@@ -38,6 +39,9 @@ if (window.fetch) {
     <nav class="head-nav" aria-label="Sections">
       <a href="#score">Score</a>
       <a href="#sim">Simulator</a>
+      <a href="#attacks">Attacks</a>
+      <a href="#compare">Compare</a>
+      <a href="#verify">Verify</a>
       <a href="#network">Testnet</a>
       <a href="#docs">Docs</a>
     </nav>
@@ -285,6 +289,201 @@ if (window.fetch) {
     </div>
   </section>
 
+  <!-- ============ Attack playground ============ -->
+  <section id="attacks" class="panel">
+    <div class="panel-head">
+      <h2>Adversarial attack playground</h2>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary sm" id="btn-attacks-all" type="button">Run all six attacks</button>
+      <span class="net-status" id="attacks-status">idle</span>
+    </div>
+    <div class="attack-grid" id="attack-grid">
+      <article class="atk-card" data-attack="replay">
+        <div class="atk-head"><h3>Signature replay</h3><span class="verdict" data-verdict>pending</span></div>
+        <ol class="atk-steps"></ol>
+        <div class="atk-foot">
+          <button class="btn btn-ghost sm" data-run-attack="replay" type="button">Run attack</button>
+          <span class="atk-def">consumed ids, actor checks, one time leaves</span>
+        </div>
+      </article>
+      <article class="atk-card" data-attack="domain">
+        <div class="atk-head"><h3>Cross-chain domain forgery</h3><span class="verdict" data-verdict>pending</span></div>
+        <ol class="atk-steps"></ol>
+        <div class="atk-foot">
+          <button class="btn btn-ghost sm" data-run-attack="domain" type="button">Run attack</button>
+          <span class="atk-def">chainid + vault address inside the preimage</span>
+        </div>
+      </article>
+      <article class="atk-card" data-attack="leaf-reuse">
+        <div class="atk-head"><h3>One-time leaf reuse</h3><span class="verdict" data-verdict>pending</span></div>
+        <ol class="atk-steps"></ol>
+        <div class="atk-foot">
+          <button class="btn btn-ghost sm" data-run-attack="leaf-reuse" type="button">Run attack</button>
+          <span class="atk-def">used-leaf bitmap + monotonic counter</span>
+        </div>
+      </article>
+      <article class="atk-card" data-attack="merkle-tamper">
+        <div class="atk-head"><h3>Merkle proof tampering</h3><span class="verdict" data-verdict>pending</span></div>
+        <ol class="atk-steps"></ol>
+        <div class="atk-foot">
+          <button class="btn btn-ghost sm" data-run-attack="merkle-tamper" type="button">Run attack</button>
+          <span class="atk-def">siblings, index and direction all verified</span>
+        </div>
+      </article>
+      <article class="atk-card" data-attack="shor-drain">
+        <div class="atk-head"><h3>Shor drain vs commit protection</h3><span class="verdict" data-verdict>pending</span></div>
+        <ol class="atk-steps"></ol>
+        <div class="atk-foot">
+          <button class="btn btn-ghost sm" data-run-attack="shor-drain" type="button">Run attack</button>
+          <span class="atk-def">no public key on chain, hiding commitment</span>
+        </div>
+      </article>
+      <article class="atk-card" data-attack="limit-bypass">
+        <div class="atk-head"><h3>Limit / guardian bypass</h3><span class="verdict" data-verdict>pending</span></div>
+        <ol class="atk-steps"></ol>
+        <div class="atk-foot">
+          <button class="btn btn-ghost sm" data-run-attack="limit-bypass" type="button">Run attack</button>
+          <span class="atk-def">caps, co-sign, timelock, payer-only admin</span>
+        </div>
+      </article>
+    </div>
+    <p class="panel-note">Contract paths run through the same PayGuardSim the anvil suite proves against real EVM bytecode; signature paths run through the in page keccak based Lamport, WOTS and merkle constructions. Every verdict below is computed live.</p>
+  </section>
+
+  <!-- ============ Scheme comparator ============ -->
+  <section id="compare" class="panel">
+    <div class="panel-head">
+      <h2>Signature scheme cost comparator</h2>
+    </div>
+    <div class="sim-bar">
+      <div class="sim-clock-ctl">
+        <label>merkle tree height
+          <select id="cmp-height">
+            <option value="0">none (single OTS)</option>
+            <option value="4">H = 4 (16 leaves)</option>
+            <option value="6">H = 6 (64 leaves)</option>
+            <option value="8" selected>H = 8 (256 leaves)</option>
+            <option value="10">H = 10 (1024 leaves)</option>
+          </select>
+        </label>
+      </div>
+      <div class="sim-clock">
+        <span class="sim-clock-label">gas model</span>
+        <code>21000 base + 16/4 calldata + 30+6/word keccak + 3000 ecrecover</code>
+      </div>
+    </div>
+    <div class="audit-scroll cmp-scroll">
+      <table class="audit-table" id="compare-table">
+        <thead><tr>
+          <th>scheme</th><th>sig bytes</th><th>pk bytes</th><th>proof</th>
+          <th>verify hashes</th><th>calldata gas</th><th>exec gas</th><th>tx total</th><th>pq</th>
+        </tr></thead>
+        <tbody id="compare-body"></tbody>
+      </table>
+    </div>
+
+    <div class="panel-head sub">
+      <h3>Key budget planner</h3>
+    </div>
+    <div class="grid-2">
+      <form id="budget-form" class="form" autocomplete="off">
+        <div class="form-row">
+          <label>Wallet tree height
+            <select id="bud-height">
+              <option value="4">H = 4 (16 leaves)</option>
+              <option value="6">H = 6 (64 leaves)</option>
+              <option value="8" selected>H = 8 (256 leaves)</option>
+              <option value="10">H = 10 (1024 leaves)</option>
+              <option value="12">H = 12 (4096 leaves)</option>
+            </select>
+          </label>
+          <label>Leaves already used
+            <input id="bud-used" type="number" min="0" step="1" value="200">
+          </label>
+        </div>
+        <div class="form-row">
+          <label>Signatures per day
+            <input id="bud-rate" type="number" min="0" step="any" value="3">
+          </label>
+        </div>
+        <p class="form-hint">A stateful hash wallet burns one merkle leaf per signature. Rotation is recommended at 90% consumption and mandatory at exhaustion.</p>
+      </form>
+      <div class="budget-out">
+        <div class="budget-bar-wrap">
+          <div class="budget-bar" id="budget-bar"></div>
+        </div>
+        <dl class="kv" id="budget-out"></dl>
+        <div class="budget-warn" id="budget-warn" hidden></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Receipts + self tests ============ -->
+  <section id="verify" class="panel">
+    <div class="panel-head">
+      <h2>Signed receipts, bookmarks and self tests</h2>
+    </div>
+    <div class="grid-2">
+      <div class="net-card">
+        <h3 class="form-title">Sign a verification receipt</h3>
+        <div class="form-row">
+          <label>Receipt payload (JSON)
+            <textarea id="rcpt-payload" rows="5" spellcheck="false"></textarea>
+          </label>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary sm" id="btn-rcpt-build" type="button">Build + WOTS sign</button>
+          <span class="net-status" id="rcpt-status">idle</span>
+        </div>
+        <div class="hash-block">
+          <span class="hash-label">receipt digest (SHA-256, domain separated)</span>
+          <code class="hash-value" id="rcpt-digest">-</code>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-ghost sm" id="btn-rcpt-json" type="button" disabled>Export JSON</button>
+          <button class="btn btn-ghost sm" id="btn-rcpt-csv" type="button" disabled>Export CSV</button>
+          <button class="btn btn-ghost sm" id="btn-rcpt-md" type="button" disabled>Export Markdown</button>
+        </div>
+        <h3 class="form-title">Verify a receipt</h3>
+        <div class="form-row">
+          <label>Paste receipt JSON
+            <textarea id="rcpt-verify-in" rows="4" spellcheck="false" placeholder='{"body":...,"digest":"0x...","signature":{...}}'></textarea>
+          </label>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-ghost sm" id="btn-rcpt-verify" type="button">Verify receipt</button>
+          <button class="btn btn-ghost sm" id="btn-rcpt-tamper" type="button">Verify tampered copy</button>
+        </div>
+        <ul class="check-list" id="rcpt-checks"></ul>
+      </div>
+      <div class="net-card">
+        <h3 class="form-title">Scenario bookmark</h3>
+        <p class="form-hint">Encode the current score panel into a <code>#pq=</code> URL fragment with an FNV-1a checksum. Anyone opening the link lands on the same scenario; a flipped character fails the checksum.</p>
+        <div class="btn-row">
+          <button class="btn btn-ghost sm" id="btn-bookmark" type="button">Build bookmark link</button>
+          <span class="net-status" id="bookmark-status">idle</span>
+        </div>
+        <div class="hash-block">
+          <span class="hash-label">bookmark fragment</span>
+          <code class="hash-value" id="bookmark-out">-</code>
+        </div>
+        <h3 class="form-title">In page self tests</h3>
+        <p class="form-hint">Runs the whole battery: FIPS 180-4 SHA-256 vectors, keccak vectors, Lamport and WOTS round trips, merkle proofs, wallet guards, all six attacks, receipts, bookmark codec and the simulator.</p>
+        <div class="btn-row">
+          <button class="btn btn-primary sm" id="btn-selftest" type="button">Run self tests</button>
+          <span class="net-status" id="selftest-status">idle</span>
+        </div>
+        <div class="audit-scroll st-scroll">
+          <table class="audit-table">
+            <thead><tr><th>check</th><th>result</th><th>detail</th></tr></thead>
+            <tbody id="selftest-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ============ Testnet ============ -->
   <section id="network" class="panel">
     <div class="panel-head">
@@ -394,8 +593,14 @@ if (window.fetch) {
 <script src="src/risk.js"></script>
 <script src="src/commit.js"></script>
 <script src="src/sim.js"></script>
+<script src="src/pqsig.js"></script>
+<script src="src/attacks.js"></script>
+<script src="src/compare.js"></script>
+<script src="src/receipt.js"></script>
+<script src="src/selftest.js"></script>
 <script src="src/rpc.js"></script>
 <script src="src/wallet.js"></script>
 <script src="src/ui.js"></script>
+<script src="src/workbench.js"></script>
 </body>
 </html>

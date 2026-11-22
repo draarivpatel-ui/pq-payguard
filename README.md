@@ -113,15 +113,21 @@ Deployed contract: pending testnet deployment (see `deployments/` once live).
 Prerequisites: Node 18+, Foundry (`forge`, `anvil`, `cast`).
 
 ```bash
-# contracts: unit + fuzz + invariant suites (42 tests)
+# contracts: unit + fuzz + invariant suites (100 tests)
 forge test
 
 # javascript: risk, abi, keccak, commitment, simulator, rpc, signing,
-# anvil parity against a real EVM, and compliance scans
+# hash-signature workbench, attack scenarios, receipts, parity vectors,
+# anvil parity against a real EVM, and compliance scans (261 tests)
 npm test
 
 # compile and print artifact facts
 node scripts/compile.mjs
+
+# headless Chromium audit at 1440x900 and 390x844: console/page errors,
+# external requests, horizontal overflow, all six attacks, comparator,
+# self tests, receipts and bookmarks (72 checks)
+node scripts/browser-check.mjs
 
 # open the demo (zero dependency static page, works offline)
 open index.html
@@ -138,6 +144,45 @@ node scripts/deploy-qday.mjs
 The deploy script verifies chain id, gas balance, and the `token()` view after
 deployment, then writes `deployments/qday-testnet.json`. Fund the deployer
 from `https://faucet.qday.info/en` first.
+
+## Hash-signature workbench
+
+Alongside the escrow, the page ships a pure-JS post-quantum signature
+workbench (`src/pqsig.js`) so judges can run the cryptographic arguments
+the product is built on:
+
+- **Lamport-256 and WOTS (w = 4/16/64/256)** one-time signatures over the
+  in-repo Keccak, with detached verification (`wotsPkFromSig` recovers the
+  public key from signature plus message, as real XMSS-style verification
+  does).
+- **Merkle trees and proofs** binding one-time public keys, plus a stateful
+  `HashWallet` with a used-leaf bitmap: a consumed leaf cannot sign twice.
+- **Six live attack scenarios** (`src/attacks.js`) that execute real crypto
+  against `PayGuardSim`, the contract-semantic simulator: signature replay
+  and cross-domain forgery (rejected by the chain/contract-bound
+  commitment), one-time leaf reuse (blocked by the bitmap; repeated reuse
+  leaks both preimages per bit position, shown honestly), Merkle sibling
+  tampering (rejected), a toy Shor ECDLP drain against an exposed classical
+  public key versus commitment protection (compromised vs protected), and a
+  limit/guardian bypass attempt (blocked by caps, timelocks and the
+  guardian requirement).
+- **Scheme comparator and key-budget planner** (`src/compare.js`): exact
+  signature/public-key/proof bytes and modeled EVM gas across Merkle
+  heights and WOTS parameters, next to classical and NIST PQC reference
+  sizes, plus a remaining-leaf rotation warning.
+- **Signed receipts and bookmarks** (`src/receipt.js`): SHA-256
+  domain-separated receipts signed with a WOTS key, detached verification
+  in page, CSV-injection-safe exports (JSON/CSV/Markdown), and a
+  checksummed `#pq=` URL-fragment codec for scenario bookmarks.
+- **In-page self-test battery** (`src/selftest.js`): 35 checks including
+  FIPS 180-4 SHA-256 and Keccak known-answer vectors, sign/verify round
+  trips, Merkle root reconstruction, leaf-exhaustion bounds, all six
+  attacks, receipt tamper detection and the bookmark codec. `?selftest`
+  runs it headlessly and exposes `window.__pqpgReport` for the audit
+  script.
+
+The toy elliptic curve (`y^2 = x^3 + 2x + 3 mod 97`) used in the Shor demo
+is labeled in page as a DLP illustration, not a cryptanalytic claim.
 
 ## Security model
 
@@ -185,10 +230,16 @@ contracts/PQPayGuardEscrow.sol   risk-gated escrow (the core deliverable)
 contracts/MockTUSD8.sol          6-decimal test token for local EVM runs
 contracts/mocks/ReentrantToken.sol  malicious token for reentrancy tests
 src/keccak.js  abi.js  chain.js  risk.js  commit.js  sim.js  rpc.js  wallet.js
-src/ui.js + index.html + styles.css   zero-dependency demo app
+src/pqsig.js   Lamport/WOTS one-time signatures, Merkle proofs, HashWallet
+src/attacks.js six live attack scenarios vs the contract-semantic simulator
+src/compare.js scheme size/gas comparator + key-budget planner
+src/receipt.js SHA-256 signed receipts, CSV-safe exports, bookmark codec
+src/selftest.js 35-check in-page battery (?selftest exposes __pqpgReport)
+src/ui.js + src/workbench.js + index.html + styles.css   zero-dep demo app
 scripts/lib/eth.mjs              secp256k1, RLP, EIP-155 signing, JSON-RPC
 scripts/compile.mjs              forge build + artifact facts
 scripts/deploy-qday.mjs          testnet deployment + verification
+scripts/browser-check.mjs        zero-dep CDP headless-Chromium audit
 test/*.t.sol                     forge unit, fuzz, invariant, reentrancy tests
 test/*.test.js                   node:test suites incl. anvil parity + compliance
 ```
