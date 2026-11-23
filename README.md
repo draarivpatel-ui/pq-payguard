@@ -81,7 +81,9 @@ quietly submit a lower score than the one the attestation was built for.
 | tUSD8 decimals   | `6`                                          |
 | Faucet contract  | `0xE5074CBbd046AFb491EB8692abD6cF7ECCC6dEE5` |
 
-Deployed contract: pending testnet deployment (see `deployments/` once live).
+Deployed contract: pending testnet deployment. Ready for 1-command deploy
+with a funded testnet wallet; see `deployments/` once live and the runbook
+in `DEMO.md`.
 
 ## Judging criteria map
 
@@ -103,8 +105,9 @@ Deployed contract: pending testnet deployment (see `deployments/` once live).
    score gates funds, which is the behavior PQ readiness actually requires.
 6. **UX.** Dark/light responsive UI, simulator with audit-log export,
    explorer links, tier badges, and an honest testnet scope disclosure.
-7. **Documentation.** This file, the risk-gate table, security model, exact
-   reproduction commands, and the deploy/verify runbook.
+7. **Documentation.** This file plus `ARCHITECTURE.md` (module map, ABI
+   surface, verification chain, roadmap) and `DEMO.md` (walkthrough, threat
+   model, deploy runbook, deployment record).
 8. **Originality.** Risk scores as passive metadata are common; a score that is
    cryptographically bound to an escrow release path is the differentiator.
 
@@ -118,11 +121,16 @@ forge test
 
 # javascript: risk, abi, keccak, commitment, simulator, rpc, signing,
 # hash-signature workbench, attack scenarios, receipts, parity vectors,
-# anvil parity against a real EVM, and compliance scans (261 tests)
+# anvil parity against a real EVM, deploy preflight, and compliance
+# scans (274 tests)
 npm test
 
 # compile and print artifact facts
 node scripts/compile.mjs
+
+# preflight: env/key format, toolchain, live chain id, block, tUSD8 and
+# deployer balance; prints the exact deploy + verify runbook
+node scripts/qday-preflight.mjs
 
 # headless Chromium audit at 1440x900 and 390x844: console/page errors,
 # external requests, horizontal overflow, all six attacks, comparator,
@@ -137,13 +145,14 @@ open index.html
 
 ```bash
 cp .env.example .env        # fill in a dedicated TESTNET-ONLY key
-export QDAY_PRIVATE_KEY=... # or source .env
+node scripts/qday-preflight.mjs   # checks env, key, toolchain, live chain
 node scripts/deploy-qday.mjs
 ```
 
 The deploy script verifies chain id, gas balance, and the `token()` view after
 deployment, then writes `deployments/qday-testnet.json`. Fund the deployer
-from `https://faucet.qday.info/en` first.
+from `https://faucet.qday.info/en` first. The full deploy plus explorer
+source-verification runbook is in `DEMO.md`.
 
 ## Hash-signature workbench
 
@@ -239,6 +248,7 @@ src/ui.js + src/workbench.js + index.html + styles.css   zero-dep demo app
 scripts/lib/eth.mjs              secp256k1, RLP, EIP-155 signing, JSON-RPC
 scripts/compile.mjs              forge build + artifact facts
 scripts/deploy-qday.mjs          testnet deployment + verification
+scripts/qday-preflight.mjs       env/key/toolchain/live-RPC preflight check
 scripts/browser-check.mjs        zero-dep CDP headless-Chromium audit
 test/*.t.sol                     forge unit, fuzz, invariant, reentrancy tests
 test/*.test.js                   node:test suites incl. anvil parity + compliance
