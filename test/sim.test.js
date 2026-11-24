@@ -324,3 +324,26 @@ test('SIM 21: audit export is valid JSON with full trail', () => {
   assert.ok(out.audit.length >= 4);
   assert.equal(out.escrows[0].status, 'funded');
 });
+
+test('SIM 22: batch revoke returns combined funds and emits per escrow audit', () => {
+  const s = newSim();
+  const sid = session(s);
+  const a = s.createEscrow(PAYER, sid, escrowInput(s, sid, 10));
+  const b = s.createEscrow(PAYER, sid, escrowInput(s, sid, 45));
+  const before = s.balanceOf(PAYER);
+  assert.equal(s.revokeEscrows(PAYER, [a, b]), true);
+  assert.equal(s.balanceOf(PAYER), before + 200_000_000n);
+  assert.equal(s.escrows.get(a).status, 3);
+  assert.equal(s.escrows.get(b).status, 3);
+  assert.ok(s.audit.some((e) => e.event === 'EscrowsBatchRevoked' && e.count === 2));
+});
+
+test('SIM 23: batch revoke validation matches the contract vocabulary', () => {
+  const s = newSim();
+  const sid = session(s);
+  const a = s.createEscrow(PAYER, sid, escrowInput(s, sid, 10));
+  assert.throws(() => s.revokeEscrows(PAYER, []), /InvalidBatchSize/);
+  assert.throws(() => s.revokeEscrows(PAYER, [a, a]), /DuplicateEscrowId/);
+  assert.throws(() => s.revokeEscrows(PAYER, [99]), /EscrowUnknown/);
+  assert.throws(() => s.revokeEscrows(RANDO, [a]), /NotPayer/);
+});

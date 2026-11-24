@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PQ PayGuard | Quantum Risk Gated tUSD8 Escrow on QDay Aevum</title>
 <meta name="description" content="A quantum exposure score bound into a tUSD8 escrow on QDay Aevum testnet chain 44005. The score selects the release path on chain: instant, timelocked, guardian co-signed or quarantined.">
-<meta name="pqpg-build" content="v3-pipeline-2026-11-23">
+<meta name="pqpg-build" content="v4-batch-rescue-2026-11-24">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="styles.css">
 <script>
@@ -311,7 +311,10 @@ if (window.fetch) {
         <div id="session-list" class="card-list"></div>
       </div>
       <div>
-        <h3 class="list-title">Escrows</h3>
+        <div class="audit-head">
+          <h3 class="list-title">Escrows</h3>
+          <button class="btn btn-ghost sm" id="btn-batch-rescue" type="button">Batch rescue funded</button>
+        </div>
         <div id="escrow-list" class="card-list"></div>
       </div>
     </div>
@@ -599,7 +602,7 @@ if (window.fetch) {
           <li>Off chain, the route is scored 0 to 100. The attestation hash and the commitment hash are computed locally.</li>
           <li><code>createEscrow</code> verifies the commitment on chain, so the stored score is provably the attested one, then pulls tUSD8 from the payer.</li>
           <li>The tier picks the path. Low releases now, Medium waits for the session delay, High also needs the guardian signature, Critical never releases.</li>
-          <li>The payer can revoke any funded escrow at any moment. A paused or revoked session freezes pending releases; funds stay reclaimable.</li>
+          <li>The payer can revoke any funded escrow at any moment, or batch rescue up to 64 funded escrows in one emergency transaction. A paused or revoked session freezes pending releases; funds stay reclaimable.</li>
         </ol>
       </div>
       <div class="doc-block">

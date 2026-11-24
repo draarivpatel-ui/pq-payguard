@@ -152,3 +152,21 @@ test('CHAIN 03: address validation', () => {
     '0x456569838f1d43009a91eba4263147afd7233483'
   );
 });
+
+test('ABI 10: dynamic uint256 array call encodes head tail layout and decodes', () => {
+  const sig = 'revokeEscrows(uint256[])';
+  const cd = A.encodeCall(sig, [[1n, 2n, 99n]]);
+  assert.equal(cd.length, 10 + 64 * 5);
+  assert.equal(cd.slice(10, 74), '0'.repeat(62) + '20'); // first head word is offset 32
+  assert.deepEqual(A.decodeCallArgs(sig, cd)[0], [1n, 2n, 99n]);
+});
+
+test('ABI 11: empty dynamic array round trips', () => {
+  const sig = 'revokeEscrows(uint256[])';
+  const cd = A.encodeCall(sig, [[]]);
+  assert.deepEqual(A.decodeCallArgs(sig, cd)[0], []);
+});
+
+test('ABI 12: dynamic array rejects non array input', () => {
+  assert.throws(() => A.encodeCall('revokeEscrows(uint256[])', [3n]), /array/);
+});

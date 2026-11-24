@@ -323,8 +323,31 @@
         .map(function (k) { return k + '=' + esc(String(a[k])).slice(0, 44); }).join(' ');
       return '<tr><td>' + a.at + '</td><td>' + esc(a.event) + '</td><td>' + detail + '</td></tr>';
     }).join('');
+    var fundedIds = [...sim.escrows.entries()].filter(function (kv) {
+      return kv[1].status === 1 && kv[1].payer === actorSel.value;
+    }).map(function (kv) { return kv[0]; });
+    var rescueBtn = $('btn-batch-rescue');
+    rescueBtn.disabled = fundedIds.length === 0 || fundedIds.length > 64;
+    rescueBtn.textContent = fundedIds.length
+      ? 'Batch rescue ' + fundedIds.length + ' funded'
+      : 'Batch rescue funded';
+    rescueBtn.title = fundedIds.length > 64
+      ? 'The contract caps one emergency batch at 64 escrows'
+      : 'Strict all-or-nothing payer rescue, mirrored from revokeEscrows(uint256[])';
     emit('sim');
   }
+
+  $('btn-batch-rescue').addEventListener('click', function () {
+    var actor = actorSel.value;
+    var ids = [...sim.escrows.entries()].filter(function (kv) {
+      return kv[1].status === 1 && kv[1].payer === actor;
+    }).map(function (kv) { return kv[0]; });
+    try {
+      sim.revokeEscrows(actor, ids);
+      say('Batch rescue applied to ' + ids.length + ' escrows');
+    } catch (e) { simError(e); return; }
+    renderSim();
+  });
 
   document.addEventListener('click', function (ev) {
     var b = ev.target.closest('button[data-act]');

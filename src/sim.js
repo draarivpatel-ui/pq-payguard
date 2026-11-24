@@ -302,6 +302,31 @@
       return true;
     }
 
+    revokeEscrows(caller, escrowIds) {
+      const ids = Array.from(escrowIds || [], (x) => Number(x));
+      if (!ids.length || ids.length > 64) fail('InvalidBatchSize');
+      if (new Set(ids).size !== ids.length) fail('DuplicateEscrowId');
+      const actor = addr(caller);
+      const rows = ids.map((id) => this._escrow(id));
+      rows.forEach((e) => {
+        if (e.status !== 1) fail('EscrowNotFunded');
+        if (actor !== e.payer) fail('NotPayer');
+      });
+      let total = 0n;
+      rows.forEach((e, i) => {
+        e.status = 3;
+        total += e.amount;
+        this._log('EscrowRevoked', {
+          escrowId: ids[i], payer: e.payer, amount: e.amount.toString()
+        });
+      });
+      this._log('EscrowsBatchRevoked', {
+        payer: actor, count: ids.length, totalAmount: total.toString()
+      });
+      this._move(this.contractAddress, actor, total);
+      return true;
+    }
+
     releaseBlocker(escrowId) {
       const e = this.escrows.get(Number(escrowId));
       if (!e) fail('EscrowUnknown');

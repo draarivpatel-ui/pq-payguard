@@ -211,3 +211,8 @@ deploy runs. PENDING means not done yet, never guessed.
   lives off chain and the contract enforces its consequence.
 - The toy elliptic curve in the Shor demo is a DLP illustration, labeled as
   such in page.
+
+
+## Batch rescue beat
+
+In the simulator, fund several escrows as the payer, then use **Batch rescue funded**. The audit trail shows one `EscrowRevoked` event per escrow plus one aggregate `EscrowsBatchRevoked`, mirroring the contract emergency path.

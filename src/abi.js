@@ -57,11 +57,43 @@
     }
   }
 
+  function isArrayType(type) {
+    return /^(.+)\[\]$/.test(type);
+  }
+
+  function arrayBaseType(type) {
+    const m = /^(.+)\[\]$/.exec(type);
+    return m ? m[1] : null;
+  }
+
+  function encodeArray(type, value) {
+    const base = arrayBaseType(type);
+    if (!base) throw new TypeError('not an array type: ' + type);
+    if (!Array.isArray(value)) throw new TypeError(type + ' expects a JavaScript array');
+    if (!/^uint\d+$/.test(base)) throw new TypeError('unsupported array element type: ' + base);
+    const len = value.length.toString(16).padStart(64, '0');
+    return len + value.map((v) => encodeWord(base, v)).join('');
+  }
+
   function encodeArgs(types, values) {
     if (types.length !== values.length) {
       throw new TypeError('arg count mismatch: ' + types.length + ' vs ' + values.length);
     }
-    return types.map((t, i) => encodeWord(t, values[i])).join('');
+    // ABI head/tail layout. Static words sit in the head; dynamic arrays are
+    // represented by a byte offset in the head and a length-prefixed tail.
+    const headSize = types.length * 32;
+    let tailBytes = 0;
+    const encodedTails = types.map((t, i) => {
+      if (!isArrayType(t)) return null;
+      const hex = encodeArray(t, values[i]);
+      const out = { hex, offset: headSize + tailBytes };
+      tailBytes += hex.length / 2;
+      return out;
+    });
+    return types.map((t, i) => {
+      if (!isArrayType(t)) return encodeWord(t, values[i]);
+      return encodedTails[i].offset.toString(16).padStart(64, '0');
+    }).join('') + encodedTails.map((x) => x ? x.hex : '').join('');
   }
 
   // Returns 0x prefixed calldata for a signature like 'release(uint256)'.
@@ -96,6 +128,14 @@
         return s;
       }
       default: {
+        if (/^uint\d+\[\]$/.test(type)) {
+          const base = arrayBaseType(type);
+          const offWords = Number(BigInt('0x' + w)) / 32;
+          const len = Number(decodeWord('uint256', hex, offWords));
+          const out = [];
+          for (let j = 0; j < len; j++) out.push(decodeWord(base, hex, offWords + 1 + j));
+          return out;
+        }
         if (!/^uint\d+$/.test(type)) throw new TypeError('unsupported type: ' + type);
         return BigInt('0x' + w);
       }
@@ -119,6 +159,9 @@
     typesOf,
     selector,
     encodeWord,
+    isArrayType,
+    arrayBaseType,
+    encodeArray,
     encodeArgs,
     encodeCall,
     decodeWord,

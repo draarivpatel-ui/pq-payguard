@@ -54,6 +54,22 @@
     return b;
   }
 
+  function bytes32OrNull(x) {
+    try {
+      const b = x instanceof Uint8Array ? x : K.hexToBytes(x);
+      return b.length === 32 ? b : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function eq32(a, b) {
+    if (!a || !b || a.length !== 32 || b.length !== 32) return false;
+    let diff = 0;
+    for (let i = 0; i < 32; i++) diff |= a[i] ^ b[i];
+    return diff === 0;
+  }
+
   // ---- bit helpers -------------------------------------------------------
 
   // MSB first bit order, matching how signature schemes read a digest.
@@ -130,10 +146,11 @@
     if (!Array.isArray(sig) || sig.length !== 256) return false;
     if (!Array.isArray(pk) || pk.length !== 256) return false;
     for (let i = 0; i < 256; i++) {
-      const h = K.keccak256(sig[i]);
-      const expect = pk[i][digestBit(m, i)];
-      if (h.length !== expect.length) return false;
-      for (let j = 0; j < 32; j++) if (h[j] !== expect[j]) return false;
+      const piece = bytes32OrNull(sig[i]);
+      const pair = pk[i];
+      if (!piece || !Array.isArray(pair) || pair.length !== 2) return false;
+      const expect = bytes32OrNull(pair[digestBit(m, i)]);
+      if (!expect || !eq32(K.keccak256(piece), expect)) return false;
     }
     return true;
   }
@@ -273,9 +290,11 @@
     if (!Array.isArray(sig) || sig.length !== p.len) return false;
     if (!Array.isArray(pk) || pk.length !== p.len) return false;
     for (let i = 0; i < p.len; i++) {
-      const h = _chain(sig[i], digits[i], (w - 1) - digits[i]);
-      if (h.length !== pk[i].length) return false;
-      for (let j = 0; j < 32; j++) if (h[j] !== pk[i][j]) return false;
+      const piece = bytes32OrNull(sig[i]);
+      const expect = bytes32OrNull(pk[i]);
+      if (!piece || !expect) return false;
+      const h = _chain(piece, digits[i], (w - 1) - digits[i]);
+      if (!eq32(h, expect)) return false;
     }
     return true;
   }
@@ -291,7 +310,8 @@
     const digits = wotsDigits(msgHash, w);
     const p = wotsParams(w);
     if (!Array.isArray(sig) || sig.length !== p.len) return null;
-    return digits.map((d, i) => _chain(sig[i], d, (w - 1) - d));
+    if (!sig.every((x) => bytes32OrNull(x))) return null;
+    return digits.map((d, i) => _chain(bytes32OrNull(sig[i]), d, (w - 1) - d));
   }
 
   function wotsLeafDigest(pk) {
@@ -322,6 +342,10 @@
   }
 
   function merkleProof(tree, index) {
+    if (!tree || !tree.layers || !tree.layers[0] ||
+        !Number.isInteger(index) || index < 0 || index >= tree.layers[0].length) {
+      fail('BadMerkleIndex', index);
+    }
     const proof = [];
     let idx = index;
     for (let level = 0; level < tree.layers.length - 1; level++) {
@@ -344,8 +368,9 @@
     } catch (e) {
       return false;
     }
-    if (!Array.isArray(proof)) return false;
-    let idx = index >>> 0;
+    if (!Array.isArray(proof) || proof.length > 32) return false;
+    if (!Number.isInteger(index) || index < 0 || index > 0xffffffff) return false;
+    let idx = index;
     for (const step of proof) {
       let sib;
       try {

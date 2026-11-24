@@ -91,6 +91,7 @@ contract PQPayGuardEscrow {
     uint8 public constant SCORE_HIGH_MAX = 84;
     uint8 public constant SCORE_CRITICAL_MAX = 100;
     uint64 public constant MAX_DELAY = 30 days;
+    uint256 public constant MAX_BATCH_REVOKE = 64;
 
     /// @notice Official tUSD8 token on QDay Aevum testnet is the intended
     /// asset; the contract accepts any ERC-20 address at construction so the
@@ -140,6 +141,7 @@ contract PQPayGuardEscrow {
     event GuardianApproved(uint256 indexed escrowId, address indexed guardian);
     event EscrowReleased(uint256 indexed escrowId, address indexed recipient, uint256 amount);
     event EscrowRevoked(uint256 indexed escrowId, address indexed payer, uint256 amount);
+    event EscrowsBatchRevoked(address indexed payer, uint256 count, uint256 totalAmount);
 
     // ------------------------------------------------------------------
     // Errors
@@ -175,6 +177,8 @@ contract PQPayGuardEscrow {
     error TimelockActive(uint64 releaseNotBefore);
     error GuardianApprovalMissing();
     error DeadlinePassed();
+    error InvalidBatchSize();
+    error DuplicateEscrowId();
 
     // ------------------------------------------------------------------
     // Modifiers
@@ -431,6 +435,38 @@ contract PQPayGuardEscrow {
         _safeTransfer(e.payer, e.amount);
     }
 
+    /// @notice Emergency batch rescue for a payer. Quantum key compromise is a
+    /// fleet problem, not a single-payment problem: this revokes up to
+    /// MAX_BATCH_REVOKE funded escrows in one transaction and returns the
+    /// combined amount in one token transfer. The batch is strict and
+    /// all-or-nothing; an unknown, duplicate, non-funded or foreign escrow id
+    /// reverts the whole rescue instead of silently skipping a payment.
+    function revokeEscrows(uint256[] calldata escrowIds) external nonReentrant {
+        if (escrowIds.length == 0 || escrowIds.length > MAX_BATCH_REVOKE) revert InvalidBatchSize();
+        uint256 totalAmount;
+        for (uint256 i = 0; i < escrowIds.length; i++) {
+            for (uint256 j = i + 1; j < escrowIds.length; j++) {
+                if (escrowIds[i] == escrowIds[j]) revert DuplicateEscrowId();
+            }
+            Escrow storage probe = _escrow(escrowIds[i]);
+            if (probe.status != Status.Funded) revert EscrowNotFunded();
+            if (msg.sender != probe.payer) revert NotPayer();
+        }
+
+        // Effects before interaction. Individual events preserve the exact
+        // audit trail produced by single revokes; the batch event records the
+        // aggregate rescue for indexers.
+        for (uint256 i = 0; i < escrowIds.length; i++) {
+            Escrow storage e = _escrow(escrowIds[i]);
+            e.status = Status.Revoked;
+            totalAmount += e.amount;
+            emit EscrowRevoked(escrowIds[i], e.payer, e.amount);
+        }
+        emit EscrowsBatchRevoked(msg.sender, escrowIds.length, totalAmount);
+
+        _safeTransfer(msg.sender, totalAmount);
+    }
+
     // ------------------------------------------------------------------
     // Views
     // ------------------------------------------------------------------
@@ -446,7 +482,7 @@ contract PQPayGuardEscrow {
     /// @notice Whether an escrow would currently pass release() gate checks.
     /// Mirrors the same branch order; useful for UI status readouts.
     function releaseBlocker(uint256 escrowId) external view returns (bytes32) {
-        Escrow storage e = _escrows[escrowId];
+        Escrow storage e = _escrow(escrowId);
         if (e.status != Status.Funded) return "not_funded";
         if (e.tier == Tier.Critical) return "quarantined";
         Session storage s = _sessions[e.sessionId];

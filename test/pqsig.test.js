@@ -587,3 +587,37 @@ test('PQ 80: digestBit reads MSB first', () => {
   assert.equal(PQ.digestBit(h, 255), 1);
   assert.equal(PQ.digestBit(h, 254), 0);
 });
+
+test('PQ 81: merkle verify rejects index wraparound instead of truncating', () => {
+  const w = new PQ.HashWallet({ height: 2, scheme: 'wots', w: 16, seed: SEED });
+  const leaf = w.leafDigest(0);
+  const proof = PQ.merkleProof(w.tree, 0);
+  assert.equal(PQ.merkleVerify(w.root, leaf, 0x100000000, proof), false);
+  assert.equal(PQ.merkleVerify(w.root, leaf, -1, proof), false);
+  assert.equal(PQ.merkleVerify(w.root, leaf, 1.5, proof), false);
+});
+
+test('PQ 82: merkle proof rejects out of range indexes', () => {
+  const w = new PQ.HashWallet({ height: 2, scheme: 'wots', w: 16, seed: SEED });
+  assert.throws(() => PQ.merkleProof(w.tree, 4), /BadMerkleIndex/);
+  assert.throws(() => PQ.merkleProof(w.tree, -1), /BadMerkleIndex/);
+});
+
+test('PQ 83: lamport verify fails closed on malformed signature pieces', () => {
+  const { pk, sk } = PQ.lamportKeygen(SEED, 0);
+  const digest = K.keccak256(K.utf8Bytes('malformed-piece'));
+  const sig = PQ.lamportSign(sk, digest);
+  sig[17] = new Uint8Array(31);
+  assert.equal(PQ.lamportVerify(pk, digest, sig), false);
+  sig[17] = null;
+  assert.equal(PQ.lamportVerify(pk, digest, sig), false);
+});
+
+test('PQ 84: wots verify and detached reconstruction fail closed on malformed pieces', () => {
+  const { pk, sk } = PQ.wotsKeygen(SEED, 16, 0);
+  const digest = K.keccak256(K.utf8Bytes('wots-malformed-piece'));
+  const sig = PQ.wotsSign(sk, 16, digest);
+  sig[3] = new Uint8Array(8);
+  assert.equal(PQ.wotsVerify(pk, 16, digest, sig), false);
+  assert.equal(PQ.wotsPkFromSig(16, digest, sig), null);
+});

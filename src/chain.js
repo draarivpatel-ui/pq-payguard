@@ -52,6 +52,7 @@
     guardianApprove: 'guardianApprove(uint256)',
     release: 'release(uint256)',
     revokeEscrow: 'revokeEscrow(uint256)',
+    revokeEscrows: 'revokeEscrows(uint256[])',
     getSession: 'getSession(uint256)',
     getEscrow: 'getEscrow(uint256)',
     releaseBlocker: 'releaseBlocker(uint256)',
@@ -64,7 +65,8 @@
     scoreMediumMax: 'SCORE_MEDIUM_MAX()',
     scoreHighMax: 'SCORE_HIGH_MAX()',
     scoreCriticalMax: 'SCORE_CRITICAL_MAX()',
-    maxDelay: 'MAX_DELAY()'
+    maxDelay: 'MAX_DELAY()',
+    maxBatchRevoke: 'MAX_BATCH_REVOKE()'
   });
 
   const TOKEN_ABI = Object.freeze({
@@ -180,6 +182,9 @@
   function buildRelease(escrowId) { return needAbi().encodeCall(ESCROW_ABI.release, [BigInt(escrowId)]); }
   function buildGuardianApprove(escrowId) { return needAbi().encodeCall(ESCROW_ABI.guardianApprove, [BigInt(escrowId)]); }
   function buildRevokeEscrow(escrowId) { return needAbi().encodeCall(ESCROW_ABI.revokeEscrow, [BigInt(escrowId)]); }
+  function buildRevokeEscrows(escrowIds) {
+    return needAbi().encodeCall(ESCROW_ABI.revokeEscrows, [(escrowIds || []).map((id) => BigInt(id))]);
+  }
   function buildSetSessionPaused(sessionId, paused) {
     return needAbi().encodeCall(ESCROW_ABI.setSessionPaused, [BigInt(sessionId), !!paused]);
   }
@@ -217,6 +222,7 @@
     buildRelease,
     buildGuardianApprove,
     buildRevokeEscrow,
+    buildRevokeEscrows,
     buildSetSessionPaused,
     buildRevokeSession,
     buildApprove,

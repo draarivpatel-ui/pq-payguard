@@ -174,3 +174,8 @@ and `test/` exercise the same branches the EVM does.
    a PQ scheme supported by the network at mainnet.
 5. Package the escrow + session pattern as a reusable template for other
    builders (the modules under `src/` are already standalone MIT pieces).
+
+
+## Emergency batch rescue
+
+`revokeEscrows(uint256[])` rescues up to 64 funded escrows owned by the caller in one transaction. Validation is strict: empty or oversized batches, duplicate ids, unknown ids, non-funded escrows and foreign escrows revert before any state changes. Each escrow emits the same `EscrowRevoked` event as a single revoke, while `EscrowsBatchRevoked` records the aggregate for indexers. Funds return in one token transfer after all effects are written.
