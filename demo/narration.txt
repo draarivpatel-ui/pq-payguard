@@ -5,7 +5,7 @@ Every score maps to a release gate, instant through quarantined, and the commitm
 Under the hero, a four stage decision pipeline reads the page live.
 The risk meter follows the next score; the spend cap gate preflights the session checks in contract order.
 The escrow stage shows the exact release blocker; the WOTS verifier tracks each receipt.
-A 1,440 scenario parity test proves the gate's first failing check is the real revert.
+A 1440 scenario parity test proves the gate's first failing check is the real revert.
 
 The additive model rates the receiving signature scheme.
 Post quantum schemes like ML DSA and SLH DSA sit low; RSA 2048 with a revealed key goes critical.

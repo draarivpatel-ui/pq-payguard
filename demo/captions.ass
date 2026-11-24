@@ -12,31 +12,31 @@ Style: Cap,Helvetica,42,&H00FFFFFF,&H000019FF,&H88141414,&H00000000,-1,0,0,0,100
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
-Dialogue: 0,0:00:00.52,0:00:07.94,Cap,,0,0,0,,PQ PayGuard turns a quantum exposure score into a binding payment decision on QDay Aevum chain 44005.
-Dialogue: 0,0:00:08.11,0:00:12.84,Cap,,0,0,0,,Dashboards leave the score as metadata. Here it selects the on chain release path.
-Dialogue: 0,0:00:13.01,0:00:19.31,Cap,,0,0,0,,Every score maps to a release gate, instant through quarantined, and the commitment binds it before funds move.
-Dialogue: 0,0:00:19.93,0:00:24.14,Cap,,0,0,0,,Under the hero, a four stage decision pipeline reads the page live.
-Dialogue: 0,0:00:24.31,0:00:30.43,Cap,,0,0,0,,The risk meter follows the next score; the spend cap gate preflights the session checks in contract order.
-Dialogue: 0,0:00:30.60,0:00:36.09,Cap,,0,0,0,,The escrow stage shows the exact release blocker; the WOTS verifier tracks each receipt.
-Dialogue: 0,0:00:36.26,0:00:42.32,Cap,,0,0,0,,A 1,440 scenario parity test proves the gate's first failing check is the real revert.
-Dialogue: 0,0:00:42.94,0:00:46.13,Cap,,0,0,0,,The additive model rates the receiving signature scheme.
-Dialogue: 0,0:00:46.30,0:00:54.41,Cap,,0,0,0,,Post quantum schemes like ML DSA and SLH DSA sit low; RSA 2048 with a revealed key goes critical.
-Dialogue: 0,0:00:54.58,0:01:00.29,Cap,,0,0,0,,Every change recomputes the attestation hash, the keccak commitment and the createEscrow calldata.
-Dialogue: 0,0:01:00.91,0:01:06.70,Cap,,0,0,0,,A deterministic local simulator mirrors the contract, same gate order and same revert names.
-Dialogue: 0,0:01:06.87,0:01:12.58,Cap,,0,0,0,,The payer opens a session policy with per escrow and cumulative caps, delays and a guardian.
-Dialogue: 0,0:01:12.75,0:01:18.22,Cap,,0,0,0,,A low score releases instantly; medium waits under its timelock, early release reverts.
-Dialogue: 0,0:01:18.39,0:01:22.74,Cap,,0,0,0,,Warp past the delay and it pays; the payer can revoke inside the window.
-Dialogue: 0,0:01:23.36,0:01:27.14,Cap,,0,0,0,,The high tier adds a guardian co-sign on top of a longer delay.
-Dialogue: 0,0:01:27.31,0:01:31.66,Cap,,0,0,0,,One guardian approval registers, then the timelock still has to pass.
-Dialogue: 0,0:01:31.84,0:01:37.58,Cap,,0,0,0,,Critical is quarantined; release always reverts and the payer reclaims, all in the audit trail.
-Dialogue: 0,0:01:38.20,0:01:40.71,Cap,,0,0,0,,Six live attacks fire at the same code.
-Dialogue: 0,0:01:40.89,0:01:48.51,Cap,,0,0,0,,Replay dies on consumed nonces; domain forgery, leaf reuse, merkle tampering and limit bypass fail closed.
-Dialogue: 0,0:01:48.68,0:01:54.20,Cap,,0,0,0,,The toy Shor drain breaks the classical key in the open; the commit protected path stays safe.
-Dialogue: 0,0:01:54.37,0:01:59.17,Cap,,0,0,0,,Every verdict is computed live, the same defenses Foundry proves on bytecode.
-Dialogue: 0,0:01:59.79,0:02:04.66,Cap,,0,0,0,,Receipts are signed by a WOTS plus merkle wallet, the SPHINCS plus hash family.
-Dialogue: 0,0:02:04.83,0:02:09.26,Cap,,0,0,0,,Build and sign, it verifies; a tampered copy is caught outright.
-Dialogue: 0,0:02:09.43,0:02:15.60,Cap,,0,0,0,,The in page battery adds SHA 256 and keccak vectors, round trips and bookmarks.
-Dialogue: 0,0:02:16.22,0:02:22.97,Cap,,0,0,0,,Nothing is asserted without a check. 287 JavaScript tests, including real Anvil EVM parity.
-Dialogue: 0,0:02:23.13,0:02:29.81,Cap,,0,0,0,,100 Foundry tests cover units, fuzz, invariants and reentrancy. 387 passing.
-Dialogue: 0,0:02:29.98,0:02:35.19,Cap,,0,0,0,,The testnet probe reads chain id and block number live, falling back to a marked simulation.
-Dialogue: 0,0:02:35.36,0:02:40.62,Cap,,0,0,0,,No mainnet transaction is claimed anywhere. PQ PayGuard. The score is the gate.
+Dialogue: 0,0:00:00.52,0:00:08.58,Cap,,0,0,0,,PQ PayGuard turns a quantum exposure score into a binding payment decision on QDay Aevum chain 44005.
+Dialogue: 0,0:00:08.75,0:00:14.45,Cap,,0,0,0,,Dashboards leave the score as metadata. Here it selects the on chain release path.
+Dialogue: 0,0:00:14.61,0:00:22.33,Cap,,0,0,0,,Every score maps to a release gate, instant through quarantined, and the commitment binds it before funds move.
+Dialogue: 0,0:00:22.95,0:00:27.59,Cap,,0,0,0,,Under the hero, a four stage decision pipeline reads the page live.
+Dialogue: 0,0:00:27.76,0:00:35.12,Cap,,0,0,0,,The risk meter follows the next score; the spend cap gate preflights the session checks in contract order.
+Dialogue: 0,0:00:35.29,0:00:41.48,Cap,,0,0,0,,The escrow stage shows the exact release blocker; the WOTS verifier tracks each receipt.
+Dialogue: 0,0:00:41.65,0:00:48.32,Cap,,0,0,0,,A 1440 scenario parity test proves the gate's first failing check is the real revert.
+Dialogue: 0,0:00:48.94,0:00:53.00,Cap,,0,0,0,,The additive model rates the receiving signature scheme.
+Dialogue: 0,0:00:53.17,0:01:00.53,Cap,,0,0,0,,Post quantum schemes like ML DSA and SLH DSA sit low; RSA 2048 with a revealed key goes critical.
+Dialogue: 0,0:01:00.70,0:01:07.75,Cap,,0,0,0,,Every change recomputes the attestation hash, the keccak commitment and the createEscrow calldata.
+Dialogue: 0,0:01:08.37,0:01:14.88,Cap,,0,0,0,,A deterministic local simulator mirrors the contract, same gate order and same revert names.
+Dialogue: 0,0:01:15.05,0:01:21.44,Cap,,0,0,0,,The payer opens a session policy with per escrow and cumulative caps, delays and a guardian.
+Dialogue: 0,0:01:21.61,0:01:27.73,Cap,,0,0,0,,A low score releases instantly; medium waits under its timelock, early release reverts.
+Dialogue: 0,0:01:27.91,0:01:32.81,Cap,,0,0,0,,Warp past the delay and it pays; the payer can revoke inside the window.
+Dialogue: 0,0:01:33.43,0:01:37.69,Cap,,0,0,0,,The high tier adds a guardian co-sign on top of a longer delay.
+Dialogue: 0,0:01:37.86,0:01:42.73,Cap,,0,0,0,,One guardian approval registers, then the timelock still has to pass.
+Dialogue: 0,0:01:42.91,0:01:49.53,Cap,,0,0,0,,Critical is quarantined; release always reverts and the payer reclaims, all in the audit trail.
+Dialogue: 0,0:01:50.15,0:01:52.90,Cap,,0,0,0,,Six live attacks fire at the same code.
+Dialogue: 0,0:01:53.07,0:02:00.47,Cap,,0,0,0,,Replay dies on consumed nonces; domain forgery, leaf reuse, merkle tampering and limit bypass fail closed.
+Dialogue: 0,0:02:00.64,0:02:07.11,Cap,,0,0,0,,The toy Shor drain breaks the classical key in the open; the commit protected path stays safe.
+Dialogue: 0,0:02:07.28,0:02:12.74,Cap,,0,0,0,,Every verdict is computed live, the same defenses Foundry proves on bytecode.
+Dialogue: 0,0:02:13.36,0:02:18.82,Cap,,0,0,0,,Receipts are signed by a WOTS plus merkle wallet, the SPHINCS plus hash family.
+Dialogue: 0,0:02:18.98,0:02:23.43,Cap,,0,0,0,,Build and sign, it verifies; a tampered copy is caught outright.
+Dialogue: 0,0:02:23.60,0:02:29.68,Cap,,0,0,0,,The in page battery adds SHA 256 and keccak vectors, round trips and bookmarks.
+Dialogue: 0,0:02:30.30,0:02:37.26,Cap,,0,0,0,,Nothing is asserted without a check. 287 JavaScript tests, including real Anvil EVM parity.
+Dialogue: 0,0:02:37.43,0:02:43.97,Cap,,0,0,0,,100 Foundry tests cover units, fuzz, invariants and reentrancy. 387 passing.
+Dialogue: 0,0:02:44.14,0:02:50.53,Cap,,0,0,0,,The testnet probe reads chain id and block number live, falling back to a marked simulation.
+Dialogue: 0,0:02:50.70,0:02:56.19,Cap,,0,0,0,,No mainnet transaction is claimed anywhere. PQ PayGuard. The score is the gate.

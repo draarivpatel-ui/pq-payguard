@@ -1,210 +1,210 @@
 {
- "voice": "Samantha",
- "rate": 180,
+ "voice": "OmniVoice-bf16 (local voice clone)",
+ "seed": 1,
  "sr": 24000,
  "lead": 0.6,
  "gap_sent": 0.3,
  "gap_para": 0.75,
  "tail": 1,
- "total": 161.565,
- "wav_seconds": 161.565,
+ "total": 177.143,
+ "wav_seconds": 177.143,
  "words": 390,
  "sentences": [
   {
    "para": 0,
    "sent": 0,
    "text": "PQ PayGuard turns a quantum exposure score into a binding payment decision on QDay Aevum chain 44005.",
-   "dur": 7.289,
+   "dur": 7.928,
    "start": 0.6
   },
   {
    "para": 0,
    "sent": 1,
    "text": "Dashboards leave the score as metadata. Here it selects the on chain release path.",
-   "dur": 4.605,
-   "start": 8.189
+   "dur": 5.567,
+   "start": 8.828
   },
   {
    "para": 0,
    "sent": 2,
    "text": "Every score maps to a release gate, instant through quarantined, and the commitment binds it before funds move.",
-   "dur": 6.162,
-   "start": 13.094
+   "dur": 7.586,
+   "start": 14.694
   },
   {
    "para": 1,
    "sent": 0,
    "text": "Under the hero, a four stage decision pipeline reads the page live.",
-   "dur": 4.083,
-   "start": 20.006
+   "dur": 4.512,
+   "start": 23.03
   },
   {
    "para": 1,
    "sent": 1,
    "text": "The risk meter follows the next score; the spend cap gate preflights the session checks in contract order.",
-   "dur": 5.991,
-   "start": 24.388
+   "dur": 7.228,
+   "start": 27.842
   },
   {
    "para": 1,
    "sent": 2,
    "text": "The escrow stage shows the exact release blocker; the WOTS verifier tracks each receipt.",
-   "dur": 5.362,
-   "start": 30.68
+   "dur": 6.064,
+   "start": 35.37
   },
   {
    "para": 1,
    "sent": 3,
-   "text": "A 1,440 scenario parity test proves the gate's first failing check is the real revert.",
-   "dur": 5.929,
-   "start": 36.342
+   "text": "A 1440 scenario parity test proves the gate's first failing check is the real revert.",
+   "dur": 6.534,
+   "start": 41.734
   },
   {
    "para": 2,
    "sent": 0,
    "text": "The additive model rates the receiving signature scheme.",
-   "dur": 3.064,
-   "start": 43.021
+   "dur": 3.932,
+   "start": 49.018
   },
   {
    "para": 2,
    "sent": 1,
    "text": "Post quantum schemes like ML DSA and SLH DSA sit low; RSA 2048 with a revealed key goes critical.",
-   "dur": 7.974,
-   "start": 46.385
+   "dur": 7.231,
+   "start": 53.25
   },
   {
    "para": 2,
    "sent": 2,
    "text": "Every change recomputes the attestation hash, the keccak commitment and the createEscrow calldata.",
-   "dur": 5.581,
-   "start": 54.659
+   "dur": 6.92,
+   "start": 60.781
   },
   {
    "para": 3,
    "sent": 0,
    "text": "A deterministic local simulator mirrors the contract, same gate order and same revert names.",
-   "dur": 5.662,
-   "start": 60.99
+   "dur": 6.38,
+   "start": 68.451
   },
   {
    "para": 3,
    "sent": 1,
    "text": "The payer opens a session policy with per escrow and cumulative caps, delays and a guardian.",
-   "dur": 5.573,
-   "start": 66.952
+   "dur": 6.262,
+   "start": 75.131
   },
   {
    "para": 3,
    "sent": 2,
    "text": "A low score releases instantly; medium waits under its timelock, early release reverts.",
-   "dur": 5.349,
-   "start": 72.825
+   "dur": 5.992,
+   "start": 81.693
   },
   {
    "para": 3,
    "sent": 3,
    "text": "Warp past the delay and it pays; the payer can revoke inside the window.",
-   "dur": 4.217,
-   "start": 78.474
+   "dur": 4.778,
+   "start": 87.986
   },
   {
    "para": 4,
    "sent": 0,
    "text": "The high tier adds a guardian co-sign on top of a longer delay.",
-   "dur": 3.646,
-   "start": 83.441
+   "dur": 4.126,
+   "start": 93.514
   },
   {
    "para": 4,
    "sent": 1,
    "text": "One guardian approval registers, then the timelock still has to pass.",
-   "dur": 4.228,
-   "start": 87.387
+   "dur": 4.745,
+   "start": 97.94
   },
   {
    "para": 4,
    "sent": 2,
    "text": "Critical is quarantined; release always reverts and the payer reclaims, all in the audit trail.",
-   "dur": 5.617,
-   "start": 91.915
+   "dur": 6.499,
+   "start": 102.985
   },
   {
    "para": 5,
    "sent": 0,
    "text": "Six live attacks fire at the same code.",
-   "dur": 2.383,
-   "start": 98.282
+   "dur": 2.615,
+   "start": 110.234
   },
   {
    "para": 5,
    "sent": 1,
    "text": "Replay dies on consumed nonces; domain forgery, leaf reuse, merkle tampering and limit bypass fail closed.",
-   "dur": 7.496,
-   "start": 100.965
+   "dur": 7.268,
+   "start": 113.149
   },
   {
    "para": 5,
    "sent": 2,
    "text": "The toy Shor drain breaks the classical key in the open; the commit protected path stays safe.",
-   "dur": 5.388,
-   "start": 108.761
+   "dur": 6.34,
+   "start": 120.717
   },
   {
    "para": 5,
    "sent": 3,
    "text": "Every verdict is computed live, the same defenses Foundry proves on bytecode.",
-   "dur": 4.675,
-   "start": 114.448
+   "dur": 5.331,
+   "start": 127.357
   },
   {
    "para": 6,
    "sent": 0,
    "text": "Receipts are signed by a WOTS plus merkle wallet, the SPHINCS plus hash family.",
-   "dur": 4.733,
-   "start": 119.874
+   "dur": 5.328,
+   "start": 133.437
   },
   {
    "para": 6,
    "sent": 1,
    "text": "Build and sign, it verifies; a tampered copy is caught outright.",
-   "dur": 4.3,
-   "start": 124.906
+   "dur": 4.314,
+   "start": 139.065
   },
   {
    "para": 6,
    "sent": 2,
    "text": "The in page battery adds SHA 256 and keccak vectors, round trips and bookmarks.",
-   "dur": 6.047,
-   "start": 129.506
+   "dur": 5.947,
+   "start": 143.68
   },
   {
    "para": 7,
    "sent": 0,
    "text": "Nothing is asserted without a check. 287 JavaScript tests, including real Anvil EVM parity.",
-   "dur": 6.611,
-   "start": 136.304
+   "dur": 6.836,
+   "start": 150.377
   },
   {
    "para": 7,
    "sent": 1,
    "text": "100 Foundry tests cover units, fuzz, invariants and reentrancy. 387 passing.",
-   "dur": 6.55,
-   "start": 143.214
+   "dur": 6.41,
+   "start": 157.513
   },
   {
    "para": 7,
    "sent": 2,
    "text": "The testnet probe reads chain id and block number live, falling back to a marked simulation.",
-   "dur": 5.074,
-   "start": 150.065
+   "dur": 6.258,
+   "start": 164.222
   },
   {
    "para": 7,
    "sent": 3,
    "text": "No mainnet transaction is claimed anywhere. PQ PayGuard. The score is the gate.",
-   "dur": 5.127,
-   "start": 155.439
+   "dur": 5.362,
+   "start": 170.781
   }
  ]
 }
