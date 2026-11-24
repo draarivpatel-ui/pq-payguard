@@ -9,7 +9,10 @@
     "test:anvil": "node --test test/anvil.test.js",
     "test:sol": "forge test -vvv",
     "compile": "node scripts/compile.mjs",
-    "deploy": "node scripts/deploy-qday.mjs"
+    "deploy": "node scripts/deploy-qday.mjs",
+    "demo:synth": "node scripts/record-demo.mjs synth",
+    "demo:capture": "node scripts/record-demo.mjs capture",
+    "demo:check": "node scripts/record-demo.mjs check"
   },
   "license": "MIT"
 }

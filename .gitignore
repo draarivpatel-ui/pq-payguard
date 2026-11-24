@@ -5,3 +5,6 @@ artifacts/
 .env
 .DS_Store
 *.log
+*.wav
+demo/*.mp4
+voice-ref.txt

@@ -1,0 +1,40 @@
+[Script Info]
+Title: pq-payguard demo captions
+ScriptType: v4.00+
+PlayResX: 1920
+PlayResY: 1080
+WrapStyle: 0
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Cap,Helvetica,42,&H00FFFFFF,&H000019FF,&H88141414,&H00000000,-1,0,0,0,100,100,0,0,3,14,0,2,120,120,46,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.52,0:00:07.94,Cap,,0,0,0,,PQ PayGuard turns a quantum exposure score into a binding payment decision on QDay Aevum chain 44005.
+Dialogue: 0,0:00:08.11,0:00:13.34,Cap,,0,0,0,,Dashboards leave that score as passive metadata. Here it selects the on chain release path.
+Dialogue: 0,0:00:13.51,0:00:20.98,Cap,,0,0,0,,The contract maps every score to a gate, instant release through full quarantine, and the commitment binds the score before funds move.
+Dialogue: 0,0:00:21.60,0:00:24.80,Cap,,0,0,0,,The additive model rates the receiving signature scheme.
+Dialogue: 0,0:00:24.97,0:00:32.21,Cap,,0,0,0,,A post quantum scheme like ML DSA, or SLH DSA from the SPHINCS plus family, sits in the low tier.
+Dialogue: 0,0:00:32.38,0:00:36.85,Cap,,0,0,0,,RSA 2048 with a revealed key climbs into the critical band.
+Dialogue: 0,0:00:37.02,0:00:42.73,Cap,,0,0,0,,Every change recomputes the attestation hash, the keccak commitment and the createEscrow calldata.
+Dialogue: 0,0:00:43.35,0:00:48.05,Cap,,0,0,0,,The simulator mirrors the contract, same gate order and same revert names.
+Dialogue: 0,0:00:48.22,0:00:54.47,Cap,,0,0,0,,The payer opens a session policy with per escrow and cumulative velocity caps, delays and a guardian.
+Dialogue: 0,0:00:54.64,0:01:01.27,Cap,,0,0,0,,A low score releases instantly; a medium score sits under the session timelock, so an early release reverts.
+Dialogue: 0,0:01:01.44,0:01:06.80,Cap,,0,0,0,,Warp the clock past the delay and it pays out, and the payer can still revoke inside the window.
+Dialogue: 0,0:01:07.42,0:01:11.19,Cap,,0,0,0,,The high tier adds a guardian co-sign on top of a longer delay.
+Dialogue: 0,0:01:11.36,0:01:15.72,Cap,,0,0,0,,One guardian approval registers, then the timelock still has to pass.
+Dialogue: 0,0:01:15.89,0:01:21.87,Cap,,0,0,0,,Critical is quarantined. Release always reverts and the payer reclaims, all of it in the audit trail.
+Dialogue: 0,0:01:22.49,0:01:28.75,Cap,,0,0,0,,Six live attacks fire at the same code. Signature replay dies on consumed nonce ids and actor checks.
+Dialogue: 0,0:01:28.92,0:01:35.13,Cap,,0,0,0,,Domain forgery, one time leaf reuse, merkle tampering and the limit bypass all fail closed.
+Dialogue: 0,0:01:35.30,0:01:41.05,Cap,,0,0,0,,The toy Shor drain breaks the classical key in the open, while the commit protected path stays safe.
+Dialogue: 0,0:01:41.22,0:01:46.49,Cap,,0,0,0,,Every verdict is computed live, the same defenses the Foundry suite proves on bytecode.
+Dialogue: 0,0:01:47.11,0:01:52.78,Cap,,0,0,0,,Receipts are signed with a WOTS plus merkle wallet, the hash family that SPHINCS plus is built on.
+Dialogue: 0,0:01:52.95,0:01:59.35,Cap,,0,0,0,,Build and sign, and the receipt verifies. Verify a tampered copy, and detection is explicit.
+Dialogue: 0,0:01:59.52,0:02:06.68,Cap,,0,0,0,,The in page battery adds SHA 256 and keccak known answers, round trips, proofs and bookmarks.
+Dialogue: 0,0:02:07.30,0:02:14.16,Cap,,0,0,0,,Nothing is asserted without a check. 274 JavaScript tests, including real Anvil EVM parity.
+Dialogue: 0,0:02:14.33,0:02:21.12,Cap,,0,0,0,,100 Foundry tests cover units, fuzz, invariants and reentrancy. 374 passing.
+Dialogue: 0,0:02:21.28,0:02:28.13,Cap,,0,0,0,,The testnet panel stays opt in. The probe reads chain id and block number live, falling back to a marked simulation.
+Dialogue: 0,0:02:28.30,0:02:35.45,Cap,,0,0,0,,The scripted qday preflight gates the one command deploy across env, key, toolchain, chain id, balance.
+Dialogue: 0,0:02:35.62,0:02:40.88,Cap,,0,0,0,,No mainnet transaction is claimed anywhere. PQ PayGuard. The score is the gate.

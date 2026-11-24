@@ -1,0 +1,103 @@
+1
+00:00:00,520 --> 00:00:07,939
+PQ PayGuard turns a quantum exposure score into a binding payment decision on QDay Aevum chain 44005.
+
+2
+00:00:08,109 --> 00:00:13,343
+Dashboards leave that score as passive metadata. Here it selects the on chain release path.
+
+3
+00:00:13,513 --> 00:00:20,981
+The contract maps every score to a gate, instant release through full quarantine, and the commitment binds the score before funds move.
+
+4
+00:00:21,601 --> 00:00:24,795
+The additive model rates the receiving signature scheme.
+
+5
+00:00:24,965 --> 00:00:32,209
+A post quantum scheme like ML DSA, or SLH DSA from the SPHINCS plus family, sits in the low tier.
+
+6
+00:00:32,379 --> 00:00:36,847
+RSA 2048 with a revealed key climbs into the critical band.
+
+7
+00:00:37,017 --> 00:00:42,728
+Every change recomputes the attestation hash, the keccak commitment and the createEscrow calldata.
+
+8
+00:00:43,348 --> 00:00:48,053
+The simulator mirrors the contract, same gate order and same revert names.
+
+9
+00:00:48,222 --> 00:00:54,471
+The payer opens a session policy with per escrow and cumulative velocity caps, delays and a guardian.
+
+10
+00:00:54,641 --> 00:01:01,269
+A low score releases instantly; a medium score sits under the session timelock, so an early release reverts.
+
+11
+00:01:01,440 --> 00:01:06,797
+Warp the clock past the delay and it pays out, and the payer can still revoke inside the window.
+
+12
+00:01:07,416 --> 00:01:11,192
+The high tier adds a guardian co-sign on top of a longer delay.
+
+13
+00:01:11,362 --> 00:01:15,720
+One guardian approval registers, then the timelock still has to pass.
+
+14
+00:01:15,890 --> 00:01:21,870
+Critical is quarantined. Release always reverts and the payer reclaims, all of it in the audit trail.
+
+15
+00:01:22,490 --> 00:01:28,753
+Six live attacks fire at the same code. Signature replay dies on consumed nonce ids and actor checks.
+
+16
+00:01:28,923 --> 00:01:35,132
+Domain forgery, one time leaf reuse, merkle tampering and the limit bypass all fail closed.
+
+17
+00:01:35,302 --> 00:01:41,052
+The toy Shor drain breaks the classical key in the open, while the commit protected path stays safe.
+
+18
+00:01:41,222 --> 00:01:46,492
+Every verdict is computed live, the same defenses the Foundry suite proves on bytecode.
+
+19
+00:01:47,112 --> 00:01:52,776
+Receipts are signed with a WOTS plus merkle wallet, the hash family that SPHINCS plus is built on.
+
+20
+00:01:52,945 --> 00:01:59,349
+Build and sign, and the receipt verifies. Verify a tampered copy, and detection is explicit.
+
+21
+00:01:59,519 --> 00:02:06,683
+The in page battery adds SHA 256 and keccak known answers, round trips, proofs and bookmarks.
+
+22
+00:02:07,303 --> 00:02:14,160
+Nothing is asserted without a check. 274 JavaScript tests, including real Anvil EVM parity.
+
+23
+00:02:14,330 --> 00:02:21,115
+100 Foundry tests cover units, fuzz, invariants and reentrancy. 374 passing.
+
+24
+00:02:21,285 --> 00:02:28,126
+The testnet panel stays opt in. The probe reads chain id and block number live, falling back to a marked simulation.
+
+25
+00:02:28,296 --> 00:02:35,451
+The scripted qday preflight gates the one command deploy across env, key, toolchain, chain id, balance.
+
+26
+00:02:35,620 --> 00:02:40,877
+No mainnet transaction is claimed anywhere. PQ PayGuard. The score is the gate.

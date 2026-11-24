@@ -1,0 +1,32 @@
+PQ PayGuard turns a quantum exposure score into a binding payment decision on QDay Aevum chain 44005.
+Dashboards leave that score as passive metadata. Here it selects the on chain release path.
+The contract maps every score to a gate, instant release through full quarantine, and the commitment binds the score before funds move.
+
+The additive model rates the receiving signature scheme.
+A post quantum scheme like ML DSA, or SLH DSA from the SPHINCS plus family, sits in the low tier.
+RSA 2048 with a revealed key climbs into the critical band.
+Every change recomputes the attestation hash, the keccak commitment and the createEscrow calldata.
+
+The simulator mirrors the contract, same gate order and same revert names.
+The payer opens a session policy with per escrow and cumulative velocity caps, delays and a guardian.
+A low score releases instantly; a medium score sits under the session timelock, so an early release reverts.
+Warp the clock past the delay and it pays out, and the payer can still revoke inside the window.
+
+The high tier adds a guardian co-sign on top of a longer delay.
+One guardian approval registers, then the timelock still has to pass.
+Critical is quarantined. Release always reverts and the payer reclaims, all of it in the audit trail.
+
+Six live attacks fire at the same code. Signature replay dies on consumed nonce ids and actor checks.
+Domain forgery, one time leaf reuse, merkle tampering and the limit bypass all fail closed.
+The toy Shor drain breaks the classical key in the open, while the commit protected path stays safe.
+Every verdict is computed live, the same defenses the Foundry suite proves on bytecode.
+
+Receipts are signed with a WOTS plus merkle wallet, the hash family that SPHINCS plus is built on.
+Build and sign, and the receipt verifies. Verify a tampered copy, and detection is explicit.
+The in page battery adds SHA 256 and keccak known answers, round trips, proofs and bookmarks.
+
+Nothing is asserted without a check. 274 JavaScript tests, including real Anvil EVM parity.
+100 Foundry tests cover units, fuzz, invariants and reentrancy. 374 passing.
+The testnet panel stays opt in. The probe reads chain id and block number live, falling back to a marked simulation.
+The scripted qday preflight gates the one command deploy across env, key, toolchain, chain id, balance.
+No mainnet transaction is claimed anywhere. PQ PayGuard. The score is the gate.
