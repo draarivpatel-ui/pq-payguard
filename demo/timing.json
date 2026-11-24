@@ -6,9 +6,9 @@
  "gap_sent": 0.3,
  "gap_para": 0.75,
  "tail": 1,
- "total": 161.827,
- "wav_seconds": 161.827,
- "words": 402,
+ "total": 161.565,
+ "wav_seconds": 161.565,
+ "words": 390,
  "sentences": [
   {
    "para": 0,
@@ -20,177 +20,191 @@
   {
    "para": 0,
    "sent": 1,
-   "text": "Dashboards leave that score as passive metadata. Here it selects the on chain release path.",
-   "dur": 5.104,
+   "text": "Dashboards leave the score as metadata. Here it selects the on chain release path.",
+   "dur": 4.605,
    "start": 8.189
   },
   {
    "para": 0,
    "sent": 2,
-   "text": "The contract maps every score to a gate, instant release through full quarantine, and the commitment binds the score before funds move.",
-   "dur": 7.338,
-   "start": 13.593
+   "text": "Every score maps to a release gate, instant through quarantined, and the commitment binds it before funds move.",
+   "dur": 6.162,
+   "start": 13.094
   },
   {
    "para": 1,
+   "sent": 0,
+   "text": "Under the hero, a four stage decision pipeline reads the page live.",
+   "dur": 4.083,
+   "start": 20.006
+  },
+  {
+   "para": 1,
+   "sent": 1,
+   "text": "The risk meter follows the next score; the spend cap gate preflights the session checks in contract order.",
+   "dur": 5.991,
+   "start": 24.388
+  },
+  {
+   "para": 1,
+   "sent": 2,
+   "text": "The escrow stage shows the exact release blocker; the WOTS verifier tracks each receipt.",
+   "dur": 5.362,
+   "start": 30.68
+  },
+  {
+   "para": 1,
+   "sent": 3,
+   "text": "A 1,440 scenario parity test proves the gate's first failing check is the real revert.",
+   "dur": 5.929,
+   "start": 36.342
+  },
+  {
+   "para": 2,
    "sent": 0,
    "text": "The additive model rates the receiving signature scheme.",
    "dur": 3.064,
-   "start": 21.681
+   "start": 43.021
   },
   {
-   "para": 1,
+   "para": 2,
    "sent": 1,
-   "text": "A post quantum scheme like ML DSA, or SLH DSA from the SPHINCS plus family, sits in the low tier.",
-   "dur": 7.114,
-   "start": 25.045
+   "text": "Post quantum schemes like ML DSA and SLH DSA sit low; RSA 2048 with a revealed key goes critical.",
+   "dur": 7.974,
+   "start": 46.385
   },
   {
-   "para": 1,
+   "para": 2,
    "sent": 2,
-   "text": "RSA 2048 with a revealed key climbs into the critical band.",
-   "dur": 4.338,
-   "start": 32.459
-  },
-  {
-   "para": 1,
-   "sent": 3,
    "text": "Every change recomputes the attestation hash, the keccak commitment and the createEscrow calldata.",
    "dur": 5.581,
-   "start": 37.097
-  },
-  {
-   "para": 2,
-   "sent": 0,
-   "text": "The simulator mirrors the contract, same gate order and same revert names.",
-   "dur": 4.575,
-   "start": 43.428
-  },
-  {
-   "para": 2,
-   "sent": 1,
-   "text": "The payer opens a session policy with per escrow and cumulative velocity caps, delays and a guardian.",
-   "dur": 6.119,
-   "start": 48.302
-  },
-  {
-   "para": 2,
-   "sent": 2,
-   "text": "A low score releases instantly; a medium score sits under the session timelock, so an early release reverts.",
-   "dur": 6.498,
-   "start": 54.721
-  },
-  {
-   "para": 2,
-   "sent": 3,
-   "text": "Warp the clock past the delay and it pays out, and the payer can still revoke inside the window.",
-   "dur": 5.227,
-   "start": 61.52
+   "start": 54.659
   },
   {
    "para": 3,
+   "sent": 0,
+   "text": "A deterministic local simulator mirrors the contract, same gate order and same revert names.",
+   "dur": 5.662,
+   "start": 60.99
+  },
+  {
+   "para": 3,
+   "sent": 1,
+   "text": "The payer opens a session policy with per escrow and cumulative caps, delays and a guardian.",
+   "dur": 5.573,
+   "start": 66.952
+  },
+  {
+   "para": 3,
+   "sent": 2,
+   "text": "A low score releases instantly; medium waits under its timelock, early release reverts.",
+   "dur": 5.349,
+   "start": 72.825
+  },
+  {
+   "para": 3,
+   "sent": 3,
+   "text": "Warp past the delay and it pays; the payer can revoke inside the window.",
+   "dur": 4.217,
+   "start": 78.474
+  },
+  {
+   "para": 4,
    "sent": 0,
    "text": "The high tier adds a guardian co-sign on top of a longer delay.",
    "dur": 3.646,
-   "start": 67.496
+   "start": 83.441
   },
   {
-   "para": 3,
+   "para": 4,
    "sent": 1,
    "text": "One guardian approval registers, then the timelock still has to pass.",
    "dur": 4.228,
-   "start": 71.442
-  },
-  {
-   "para": 3,
-   "sent": 2,
-   "text": "Critical is quarantined. Release always reverts and the payer reclaims, all of it in the audit trail.",
-   "dur": 5.85,
-   "start": 75.97
+   "start": 87.387
   },
   {
    "para": 4,
+   "sent": 2,
+   "text": "Critical is quarantined; release always reverts and the payer reclaims, all in the audit trail.",
+   "dur": 5.617,
+   "start": 91.915
+  },
+  {
+   "para": 5,
    "sent": 0,
-   "text": "Six live attacks fire at the same code. Signature replay dies on consumed nonce ids and actor checks.",
-   "dur": 6.133,
-   "start": 82.57
+   "text": "Six live attacks fire at the same code.",
+   "dur": 2.383,
+   "start": 98.282
   },
   {
-   "para": 4,
+   "para": 5,
    "sent": 1,
-   "text": "Domain forgery, one time leaf reuse, merkle tampering and the limit bypass all fail closed.",
-   "dur": 6.079,
-   "start": 89.003
+   "text": "Replay dies on consumed nonces; domain forgery, leaf reuse, merkle tampering and limit bypass fail closed.",
+   "dur": 7.496,
+   "start": 100.965
   },
   {
-   "para": 4,
+   "para": 5,
    "sent": 2,
-   "text": "The toy Shor drain breaks the classical key in the open, while the commit protected path stays safe.",
-   "dur": 5.62,
-   "start": 95.382
+   "text": "The toy Shor drain breaks the classical key in the open; the commit protected path stays safe.",
+   "dur": 5.388,
+   "start": 108.761
   },
   {
-   "para": 4,
+   "para": 5,
    "sent": 3,
-   "text": "Every verdict is computed live, the same defenses the Foundry suite proves on bytecode.",
-   "dur": 5.14,
-   "start": 101.302
-  },
-  {
-   "para": 5,
-   "sent": 0,
-   "text": "Receipts are signed with a WOTS plus merkle wallet, the hash family that SPHINCS plus is built on.",
-   "dur": 5.534,
-   "start": 107.192
-  },
-  {
-   "para": 5,
-   "sent": 1,
-   "text": "Build and sign, and the receipt verifies. Verify a tampered copy, and detection is explicit.",
-   "dur": 6.274,
-   "start": 113.025
-  },
-  {
-   "para": 5,
-   "sent": 2,
-   "text": "The in page battery adds SHA 256 and keccak known answers, round trips, proofs and bookmarks.",
-   "dur": 7.034,
-   "start": 119.599
+   "text": "Every verdict is computed live, the same defenses Foundry proves on bytecode.",
+   "dur": 4.675,
+   "start": 114.448
   },
   {
    "para": 6,
    "sent": 0,
-   "text": "Nothing is asserted without a check. 274 JavaScript tests, including real Anvil EVM parity.",
-   "dur": 6.727,
-   "start": 127.383
+   "text": "Receipts are signed by a WOTS plus merkle wallet, the SPHINCS plus hash family.",
+   "dur": 4.733,
+   "start": 119.874
   },
   {
    "para": 6,
    "sent": 1,
-   "text": "100 Foundry tests cover units, fuzz, invariants and reentrancy. 374 passing.",
-   "dur": 6.655,
-   "start": 134.41
+   "text": "Build and sign, it verifies; a tampered copy is caught outright.",
+   "dur": 4.3,
+   "start": 124.906
   },
   {
    "para": 6,
    "sent": 2,
-   "text": "The testnet panel stays opt in. The probe reads chain id and block number live, falling back to a marked simulation.",
-   "dur": 6.711,
-   "start": 141.365
+   "text": "The in page battery adds SHA 256 and keccak vectors, round trips and bookmarks.",
+   "dur": 6.047,
+   "start": 129.506
   },
   {
-   "para": 6,
+   "para": 7,
+   "sent": 0,
+   "text": "Nothing is asserted without a check. 287 JavaScript tests, including real Anvil EVM parity.",
+   "dur": 6.611,
+   "start": 136.304
+  },
+  {
+   "para": 7,
+   "sent": 1,
+   "text": "100 Foundry tests cover units, fuzz, invariants and reentrancy. 387 passing.",
+   "dur": 6.55,
+   "start": 143.214
+  },
+  {
+   "para": 7,
+   "sent": 2,
+   "text": "The testnet probe reads chain id and block number live, falling back to a marked simulation.",
+   "dur": 5.074,
+   "start": 150.065
+  },
+  {
+   "para": 7,
    "sent": 3,
-   "text": "The scripted qday preflight gates the one command deploy across env, key, toolchain, chain id, balance.",
-   "dur": 7.025,
-   "start": 148.376
-  },
-  {
-   "para": 6,
-   "sent": 4,
    "text": "No mainnet transaction is claimed anywhere. PQ PayGuard. The score is the gate.",
    "dur": 5.127,
-   "start": 155.7
+   "start": 155.439
   }
  ]
 }

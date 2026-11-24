@@ -38,12 +38,14 @@ deleted on exit. It aborts if the page ever navigates off the demo origin.
 
 | Time (approx) | Beat |
 | --- | --- |
-| 0:00 - 0:21 | Hero and the four-tier gate table, zoom on the critical row. |
-| 0:21 - 0:43 | Score panel: `ml-dsa-44` and `slh-dsa-128s` land low; `rsa-2048` plus a revealed key goes critical; attestation hash, keccak commitment and `createEscrow` calldata recompute live. |
-| 0:43 - 0:67 | Simulator: session policy with per-escrow and cumulative velocity caps plus a guardian; low escrow releases instantly; medium escrow early-release reverts, warp past the delay, release pays, a second medium escrow is revoked by the payer. |
-| 0:67 - 0:85 | High tier: guardian approve plus the long timelock, then release. Critical tier: release always reverts, payer reclaims; audit trail. |
-| 0:85 - 1:47 | All six attacks live: signature replay on consumed nonce ids, domain forgery, leaf reuse, merkle tampering, toy Shor drain, limit and guardian bypass; then WOTS+merkle receipt sign, verify and tamper detect, and the 35-check in-page battery. |
-| 1:47 - 2:43 | Testnet panel: opt-in live RPC probe (chain id 44005, block number, tUSD8 supply), wallet helper, params table, honest-scope docs. |
+| 0:00 - 0:19 | Hero and the four-tier gate table, zoom on the critical row. |
+| 0:20 - 0:42 | Decision pipeline under the hero: the risk meter needle jumps critical on `rsa-2048` and drops low on `ml-dsa-44` while the stage-2 cap gate, stage-3 escrow and stage-4 WOTS verifier stay honestly idle. |
+| 0:43 - 1:00 | Score panel: `slh-dsa-128s` sits low; `rsa-2048` plus a revealed key goes critical; attestation hash, keccak commitment and `createEscrow` calldata recompute live. |
+| 1:01 - 1:22 | Simulator: session policy with per-escrow and cumulative caps plus a guardian; low escrow releases instantly; medium escrow early-release reverts, warp past the delay, release pays, a second medium escrow is revoked by the payer. |
+| 1:23 - 1:37 | High tier: guardian approve plus the long timelock, then release. Critical tier: release always reverts, payer reclaims; audit trail. |
+| 1:38 - 1:59 | All six attacks live: replay on consumed nonces, domain forgery, leaf reuse, merkle tampering, toy Shor drain, limit bypass; back at the pipeline the defenses row reads 6/6 held with verdicts mapped onto their stages. |
+| 1:59 - 2:15 | WOTS+merkle receipt build, verify and tamper detect; the 35-check in-page battery. |
+| 2:16 - 2:41 | Testnet panel: opt-in live RPC probe (chain id 44005, block number, tUSD8 supply), wallet helper, params table, honest-scope docs. |
 
 ## Honesty note
 
@@ -56,5 +58,8 @@ RPC during this recording (chain id `44005`); the narration also states the
 marked-simulation fallback. Signature material is the in-page keccak based
 Lamport, WOTS and merkle construction, the hash family SLH-DSA descends
 from; the risk model scores `ml-dsa-*` and `slh-dsa-*` scheme labels as
-listed in `src/risk.js`. The `374` test figure is the real `npm test` +
-`forge test` count (`274` JavaScript + `100` Foundry).
+listed in `src/risk.js`. The `387` test figure is the real `npm test` +
+`forge test` count (`287` JavaScript + `100` Foundry); `scripts/browser-check.mjs`
+audits the live page over `72` checks, and `test/pipeline.test.js` proves the
+cap gate's first failing check equals the real `PayGuardSim` revert across a
+1,440-scenario grid.
