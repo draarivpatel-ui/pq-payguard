@@ -26,7 +26,7 @@ const U = 1_000_000n; // one tUSD8 in raw units
 function newSim(opts) {
   const o = opts || {};
   const s = new SIM.PayGuardSim({ chainId: 44005, contractAddress: '0x' + '11'.repeat(20), now: T0 });
-  s.mint(PAYER, 1_000_000n * U);
+  s.mint(PAYER, o.poor ? 100n * U : 1_000_000n * U);
   const sid = s.createSession(PAYER, {
     operator: OPERATOR,
     guardian: o.noGuardian ? null : GUARDIAN,
@@ -34,6 +34,8 @@ function newSim(opts) {
     expiry: T0 + 86400, mediumDelay: 900, highDelay: 14400
   });
   s.approve(PAYER, s.contractAddress, 1200n * U);
+  // a later session's approve() replaces the allowance, as in ui.js
+  if (o.lowAllowance) s.approve(PAYER, s.contractAddress, 100n * U);
   if (o.prespend) {
     for (let k = 0; k < 2; k++) {
       const dl = s.now + 3600;
@@ -80,7 +82,8 @@ test('PIPE 02: scheme classes agree with the score model bases', () => {
 });
 
 test('PIPE 03: preflight first failure equals the simulator revert across a scenario grid', () => {
-  const sessions = [{}, { paused: true }, { revoked: true }, { expired: true }, { noGuardian: true }, { prespend: true }];
+  const sessions = [{}, { paused: true }, { revoked: true }, { expired: true }, { noGuardian: true }, { prespend: true },
+    { lowAllowance: true }, { poor: true }];
   const actors = [PAYER, OPERATOR, RANDO];
   const amounts = [0n, 1n * U, 500n * U, 501n * U, 300n * U];
   const scores = [10, 45, 70, 92];
@@ -96,7 +99,8 @@ test('PIPE 03: preflight first failure equals the simulator revert across a scen
             const { s: s2, sid: sid2 } = newSim(so);
             const got = P.preflight({
               session: s2.sessions.get(sid2), now: s2.now, actor, amountRaw: amount,
-              score, deadlineSecs: h * 3600, decimals: 6
+              score, deadlineSecs: h * 3600, decimals: 6,
+              allowance: s2.allowance(PAYER, s2.contractAddress), balance: s2.balanceOf(PAYER)
             }).firstFail;
             assert.equal(got, want, JSON.stringify({ so, actor, amount: String(amount), score, h }));
             cases++;
@@ -105,7 +109,18 @@ test('PIPE 03: preflight first failure equals the simulator revert across a scen
       }
     }
   }
-  assert.ok(cases >= 1000, 'grid too small: ' + cases);
+  assert.ok(cases >= 1400, 'grid too small: ' + cases);
+});
+
+test('PIPE 12: a later session approve() shrinking the allowance turns the gate to InsufficientAllowance', () => {
+  const { s, sid } = newSim();
+  s.approve(PAYER, s.contractAddress, 100n * U);
+  const pf = P.preflight({
+    session: s.sessions.get(sid), now: s.now, actor: PAYER, amountRaw: 250n * U, score: 10,
+    deadlineSecs: 86400, decimals: 6, allowance: s.allowance(PAYER, s.contractAddress), balance: s.balanceOf(PAYER)
+  });
+  assert.equal(pf.firstFail, 'InsufficientAllowance');
+  assert.equal(simOutcome(s, sid, PAYER, 250n * U, 10, 24), 'InsufficientAllowance');
 });
 
 test('PIPE 04: no session, no escrow, no attacks, no receipt means idle, never a pass', () => {

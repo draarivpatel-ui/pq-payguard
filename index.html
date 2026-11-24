@@ -121,7 +121,7 @@ if (window.fetch) {
         <div class="stage-body" id="pipe-receipt"><p class="stage-line">Build and WOTS sign a receipt to drive this stage.</p></div>
       </li>
     </ol>
-    <p class="panel-note">Every stage reads live page state. Stage 1 follows the score the next simulator escrow will commit (the score panel, or the escrow form override). Stage 2 previews the simulator's own <code>createEscrow</code> session, cap, score and deadline checks in the same order; the authoritative result is the simulator revert it shows after you fund. Stage 3 tracks the latest escrow and its <code>releaseBlocker</code>. Stage 4 shows the last receipt build or verify. The scheme chip classifies the receiving scheme under the score model only: the escrow contract performs no post quantum signatures. Attack rows stay "not run" until you run them.</p>
+    <p class="panel-note">Every stage reads live page state. Stage 1 follows the score the next simulator escrow will commit (the score panel, or the escrow form override). Stage 2 previews the simulator's own <code>createEscrow</code> session, cap, score, deadline, allowance and balance checks in the same order; the authoritative result is the simulator revert it shows after you fund. Stage 3 tracks the latest escrow and its <code>releaseBlocker</code>. Stage 4 shows the last receipt build or verify. The scheme chip classifies the receiving scheme under the score model only: the escrow contract performs no post quantum signatures. Attack rows stay "not run" until you run them.</p>
   </section>
 
   <!-- ============ Risk scoring ============ -->

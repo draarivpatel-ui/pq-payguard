@@ -5,8 +5,9 @@
  *   1. Risk tier meter     the score the next escrow will commit, its tier
  *                          and the release path the contract assigns to it
  *   2. Spend cap gate      a preflight of the session, actor, per tx cap,
- *                          cumulative cap, guardian and deadline checks in
- *                          the same order PayGuardSim.createEscrow runs them
+ *                          cumulative cap, score, guardian, deadline,
+ *                          allowance and balance checks in the same order
+ *                          PayGuardSim.createEscrow runs them
  *   3. Escrow state        the latest escrow in the simulator and the exact
  *                          releaseBlocker the simulator reports for it
  *   4. WOTS receipt        the last receipt build or verify result, with the
@@ -101,8 +102,10 @@
   /*
    * Preflight of PayGuardSim.createEscrow, same branch order, stopping at the
    * first failure. Hash and commitment checks are left out because the page
-   * computes both itself; allowance and balance are left out because the
-   * session approves its full cumulative cap on creation.
+   * computes both itself, and the recipient check because the page only
+   * offers valid recipients. Allowance and balance run last, as in the
+   * simulator, when the caller passes them: a later session's approve()
+   * replaces the payer's allowance, so an earlier session can run short.
    */
   function preflight(p) {
     const checks = [];
@@ -136,6 +139,13 @@
       const delay = tier === 0 ? 0 : (tier === 1 ? s.mediumDelay : s.highDelay);
       add('deadline after unlock', p.deadlineSecs > delay, 'DeadlineBeforeUnlock',
         'unlock ' + fmtDuration(delay) + ', deadline ' + fmtDuration(p.deadlineSecs));
+    }
+    if (p.allowance !== undefined && p.allowance !== null) {
+      add('allowance covers amount', amt !== null && amt <= p.allowance, 'InsufficientAllowance',
+        fmtUnits(p.allowance, p.decimals) + ' approved');
+    }
+    if (p.balance !== undefined && p.balance !== null) {
+      add('payer balance covers amount', amt !== null && amt <= p.balance, 'InsufficientBalance');
     }
     return { checks, firstFail };
   }
@@ -227,7 +237,8 @@
 
     const pf = preflight({
       session: i.session, now: i.now, actor: pending.actor, amountRaw: pending.amountRaw === undefined ? null : pending.amountRaw,
-      score, deadlineSecs: pending.deadlineSecs || 0, decimals
+      score, deadlineSecs: pending.deadlineSecs || 0, decimals,
+      allowance: i.allowance, balance: i.balance
     });
     const s = i.session;
     const cap = {
@@ -341,6 +352,8 @@
           deadlineSecs: Number(($('esc-deadline') && $('esc-deadline').value) || 0) * 3600
         },
         session, sessionId: sid, now: sim ? sim.now : 0, decimals: CH.TUSD8.decimals,
+        allowance: session ? sim.allowance(session.payer, sim.contractAddress) : null,
+        balance: session ? sim.balanceOf(session.payer) : null,
         escrow, lastRevert, attacks,
         receipt: wb.receipt ? wb.receipt() : null
       };
@@ -348,7 +361,14 @@
 
     function render() {
       let m;
-      try { m = derive(gather()); } catch (e) { return; }
+      try { m = derive(gather()); } catch (e) {
+        // never leave a stale verdict on screen: say so, and surface the error to the audit hooks
+        const msg = String(e && e.message || e);
+        try { (window.__pqpgErrors = window.__pqpgErrors || []).push('pipeline:' + msg); } catch (e2) { /* ignore */ }
+        const d = $('pipe-decision');
+        if (d) { d.textContent = 'Pipeline unavailable: ' + msg; d.setAttribute('data-tone', 'bad'); }
+        return;
+      }
       const st = m.stages;
 
       const dec = $('pipe-decision');
@@ -370,7 +390,7 @@
         (r.score === null ? '' : '<span class="meter-needle" style="left:' + r.pct + '%"></span>') +
         '</div>' +
         '<div class="meter-scale" aria-hidden="true"><span>0</span><span style="left:30%">30</span><span style="left:60%">60</span><span style="left:85%">85</span><span style="left:100%">100</span></div>' +
-        (r.schemeChip ? '<div class="scheme-row"><code>' + esc(r.scheme) + '</code><span class="pchip" data-tone="' + r.schemeChip.tone + '">' + esc(r.schemeChip.text) + '</span></div>' : '') +
+        (r.schemeChip ? '<div class="scheme-row">' + (r.source === 'override' ? '<span class="readout-unit">score panel scheme</span>' : '') + '<code>' + esc(r.scheme) + '</code><span class="pchip" data-tone="' + r.schemeChip.tone + '">' + esc(r.schemeChip.text) + '</span></div>' : '') +
         '<p class="stage-line">' + esc(r.path) + '</p>' + atkRow(r.attacks);
 
       // 2. cap gate

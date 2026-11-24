@@ -122,7 +122,7 @@ forge test
 # javascript: risk, abi, keccak, commitment, simulator, rpc, signing,
 # hash-signature workbench, attack scenarios, receipts, parity vectors,
 # anvil parity against a real EVM, deploy preflight, the decision
-# pipeline view model, and compliance scans (286 tests)
+# pipeline view model, and compliance scans (287 tests)
 npm test
 
 # compile and print artifact facts
@@ -202,12 +202,13 @@ action, attack run and receipt verification:
 1. **Risk tier meter**: the score the next simulator escrow will commit (the
    score panel, or the escrow form override), its tier, the release path the
    contract assigns, and whether the receiving scheme is a PQ-resistant
-   family or quantum-vulnerable under the score model.
+   family or quantum-vulnerable under the score model (labeled as the score
+   panel's scheme when the escrow form override supplies the score).
 2. **Spend cap gate**: a preflight of `createEscrow`'s session, actor, per
-   tx cap, cumulative cap, score, guardian and deadline checks in the
-   simulator's own branch order. `test/pipeline.test.js` proves the first
+   tx cap, cumulative cap, score, guardian, deadline, allowance and balance
+   checks in the simulator's own branch order. `test/pipeline.test.js` proves the first
    failing check equals the real `PayGuardSim` revert over a grid of more
-   than 1,000 scenarios; the simulator revert itself is shown after funding.
+   than 1,400 scenarios; the simulator revert itself is shown after funding.
 3. **Escrow state machine**: the latest escrow and the exact
    `releaseBlocker` the simulator reports (timelock, awaiting guardian, gate
    open, released, revoked, quarantined, frozen).
