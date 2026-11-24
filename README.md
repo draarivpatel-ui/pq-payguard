@@ -121,8 +121,8 @@ forge test
 
 # javascript: risk, abi, keccak, commitment, simulator, rpc, signing,
 # hash-signature workbench, attack scenarios, receipts, parity vectors,
-# anvil parity against a real EVM, deploy preflight, and compliance
-# scans (274 tests)
+# anvil parity against a real EVM, deploy preflight, the decision
+# pipeline view model, and compliance scans (286 tests)
 npm test
 
 # compile and print artifact facts
@@ -193,6 +193,32 @@ the product is built on:
 The toy elliptic curve (`y^2 = x^3 + 2x + 3 mod 97`) used in the Shor demo
 is labeled in page as a DLP illustration, not a cryptanalytic claim.
 
+## Decision pipeline
+
+The first panel under the hero (`#pipeline`, `src/pipeline.js`) reads the
+whole page as four stages and updates on every score change, simulator
+action, attack run and receipt verification:
+
+1. **Risk tier meter**: the score the next simulator escrow will commit (the
+   score panel, or the escrow form override), its tier, the release path the
+   contract assigns, and whether the receiving scheme is a PQ-resistant
+   family or quantum-vulnerable under the score model.
+2. **Spend cap gate**: a preflight of `createEscrow`'s session, actor, per
+   tx cap, cumulative cap, score, guardian and deadline checks in the
+   simulator's own branch order. `test/pipeline.test.js` proves the first
+   failing check equals the real `PayGuardSim` revert over a grid of more
+   than 1,000 scenarios; the simulator revert itself is shown after funding.
+3. **Escrow state machine**: the latest escrow and the exact
+   `releaseBlocker` the simulator reports (timelock, awaiting guardian, gate
+   open, released, revoked, quarantined, frozen).
+4. **WOTS receipt verifier**: the last receipt build or verify, its check
+   count and the signing wallet's one time leaf map.
+
+Each stage also lists the attacks from `src/attacks.js` that exercise it.
+Nothing is pre-filled: before a session, escrow, attack run or receipt the
+stage says so. The scheme chip is a label from the score model; the escrow
+contract performs no post-quantum signatures.
+
 ## Security model
 
 - **Commitment binding.** `keccak256(abi.encode(chainid, escrow, sessionId,
@@ -244,6 +270,7 @@ src/attacks.js six live attack scenarios vs the contract-semantic simulator
 src/compare.js scheme size/gas comparator + key-budget planner
 src/receipt.js SHA-256 signed receipts, CSV-safe exports, bookmark codec
 src/selftest.js 35-check in-page battery (?selftest exposes __pqpgReport)
+src/pipeline.js four-stage decision pipeline view (pure derive + DOM binding)
 src/ui.js + src/workbench.js + index.html + styles.css   zero-dep demo app
 scripts/lib/eth.mjs              secp256k1, RLP, EIP-155 signing, JSON-RPC
 scripts/compile.mjs              forge build + artifact facts

@@ -4,8 +4,8 @@
   "description": "Quantum risk gated tUSD8 escrow on QDay Aevum testnet (chain 44005)",
   "private": true,
   "scripts": {
-    "test": "node --test test/risk.test.js test/abi.test.js test/commit.test.js test/sim.test.js test/rpc.test.js test/deploylib.test.js test/anvil.test.js test/compliance.test.js test/pqsig.test.js test/attacks.test.js test/compare.test.js test/receipt.test.js test/parity.test.js test/preflight.test.js test/ui-structure.test.js",
-    "test:unit": "node --test test/risk.test.js test/abi.test.js test/commit.test.js test/sim.test.js test/rpc.test.js test/deploylib.test.js test/compliance.test.js test/pqsig.test.js test/attacks.test.js test/compare.test.js test/receipt.test.js test/parity.test.js test/preflight.test.js test/ui-structure.test.js",
+    "test": "node --test test/risk.test.js test/abi.test.js test/commit.test.js test/sim.test.js test/rpc.test.js test/deploylib.test.js test/anvil.test.js test/compliance.test.js test/pqsig.test.js test/attacks.test.js test/compare.test.js test/receipt.test.js test/parity.test.js test/preflight.test.js test/pipeline.test.js test/ui-structure.test.js",
+    "test:unit": "node --test test/risk.test.js test/abi.test.js test/commit.test.js test/sim.test.js test/rpc.test.js test/deploylib.test.js test/compliance.test.js test/pqsig.test.js test/attacks.test.js test/compare.test.js test/receipt.test.js test/parity.test.js test/preflight.test.js test/pipeline.test.js test/ui-structure.test.js",
     "test:anvil": "node --test test/anvil.test.js",
     "test:sol": "forge test -vvv",
     "compile": "node scripts/compile.mjs",

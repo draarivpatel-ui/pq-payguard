@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PQ PayGuard | Quantum Risk Gated tUSD8 Escrow on QDay Aevum</title>
 <meta name="description" content="A quantum exposure score bound into a tUSD8 escrow on QDay Aevum testnet chain 44005. The score selects the release path on chain: instant, timelocked, guardian co-signed or quarantined.">
-<meta name="pqpg-build" content="v2-attacks-2026-11-22">
+<meta name="pqpg-build" content="v3-pipeline-2026-11-23">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="styles.css">
 <script>
@@ -33,10 +33,11 @@ if (window.fetch) {
 <header class="site-head">
   <div class="wrap head-inner">
     <a class="brand" href="./">
-      <span class="brand-mark" aria-hidden="true">PG</span>
+      <span class="brand-mark" aria-hidden="true">pq</span>
       <span class="brand-text">PQ<span class="brand-dim">PayGuard</span></span>
     </a>
     <nav class="head-nav" aria-label="Sections">
+      <a href="#pipeline">Pipeline</a>
       <a href="#score">Score</a>
       <a href="#sim">Simulator</a>
       <a href="#attacks">Attacks</a>
@@ -71,21 +72,62 @@ if (window.fetch) {
           <tr><th>Score</th><th>Tier</th><th>Release path</th></tr>
         </thead>
         <tbody>
-          <tr><td><code>0 - 29</code></td><td><span class="tier tier-low">low</span></td><td>instant release to recipient</td></tr>
-          <tr><td><code>30 - 59</code></td><td><span class="tier tier-med">medium</span></td><td>timelock delay, payer may revoke first</td></tr>
-          <tr><td><code>60 - 84</code></td><td><span class="tier tier-high">high</span></td><td>extended timelock plus guardian co-sign</td></tr>
-          <tr><td><code>85 - 100</code></td><td><span class="tier tier-crit">critical</span></td><td>quarantined, payer reclaims</td></tr>
+          <tr><td><code class="rng">0-29</code></td><td><span class="tier tier-low">low</span></td><td>instant release to recipient</td></tr>
+          <tr><td><code class="rng">30-59</code></td><td><span class="tier tier-med">medium</span></td><td>timelock delay, payer may revoke first</td></tr>
+          <tr><td><code class="rng">60-84</code></td><td><span class="tier tier-high">high</span></td><td>extended timelock plus guardian co-sign</td></tr>
+          <tr><td><code class="rng">85-100</code></td><td><span class="tier tier-crit">critical</span></td><td>quarantined, payer reclaims</td></tr>
         </tbody>
       </table>
       <p class="panel-note">Every tier boundary is enforced by the contract, not by metadata. The commitment hash binds the score before funds move.</p>
     </div>
   </section>
 
+  <!-- ============ Decision pipeline ============ -->
+  <section id="pipeline" class="panel pipeline" aria-labelledby="pipeline-title">
+    <div class="pipe-head">
+      <h2 id="pipeline-title">Decision pipeline</h2>
+      <div class="pipe-status">
+        <span class="pipe-decision" id="pipe-decision" role="status" data-tone="idle">Next escrow: waiting for page state</span>
+        <span class="pipe-defenses" id="pipe-defenses" data-tone="idle">attacks not run</span>
+      </div>
+    </div>
+    <ol class="pipe" id="pipe">
+      <li class="stage" id="stage-risk">
+        <div class="stage-top">
+          <h3><span class="stage-idx" aria-hidden="true">1</span>Risk tier meter</h3>
+          <span class="pchip" id="pipe-risk-chip" data-tone="idle">idle</span>
+        </div>
+        <div class="stage-body" id="pipe-risk"><p class="stage-line">Scoring loads with the page.</p></div>
+      </li>
+      <li class="stage" id="stage-cap">
+        <div class="stage-top">
+          <h3><span class="stage-idx" aria-hidden="true">2</span>Spend cap gate</h3>
+          <span class="pchip" id="pipe-cap-chip" data-tone="idle">idle</span>
+        </div>
+        <div class="stage-body" id="pipe-cap"><p class="stage-line">Create a session policy in the simulator to arm this gate.</p></div>
+      </li>
+      <li class="stage" id="stage-escrow">
+        <div class="stage-top">
+          <h3><span class="stage-idx" aria-hidden="true">3</span>Escrow state machine</h3>
+          <span class="pchip" id="pipe-escrow-chip" data-tone="idle">idle</span>
+        </div>
+        <div class="stage-body" id="pipe-escrow"><p class="stage-line">Fund an escrow in the simulator to drive this stage.</p></div>
+      </li>
+      <li class="stage" id="stage-receipt">
+        <div class="stage-top">
+          <h3><span class="stage-idx" aria-hidden="true">4</span>WOTS receipt verifier</h3>
+          <span class="pchip" id="pipe-receipt-chip" data-tone="idle">idle</span>
+        </div>
+        <div class="stage-body" id="pipe-receipt"><p class="stage-line">Build and WOTS sign a receipt to drive this stage.</p></div>
+      </li>
+    </ol>
+    <p class="panel-note">Every stage reads live page state. Stage 1 follows the score the next simulator escrow will commit (the score panel, or the escrow form override). Stage 2 previews the simulator's own <code>createEscrow</code> session, cap, score and deadline checks in the same order; the authoritative result is the simulator revert it shows after you fund. Stage 3 tracks the latest escrow and its <code>releaseBlocker</code>. Stage 4 shows the last receipt build or verify. The scheme chip classifies the receiving scheme under the score model only: the escrow contract performs no post quantum signatures. Attack rows stay "not run" until you run them.</p>
+  </section>
+
   <!-- ============ Risk scoring ============ -->
   <section id="score" class="panel">
     <div class="panel-head">
       <h2>Quantum exposure score</h2>
-      <p>A deterministic additive model rates the receiving scheme. Factors feed the same tier table the contract enforces.</p>
     </div>
     <div class="grid-2">
       <form id="score-form" class="form" autocomplete="off">
@@ -116,7 +158,6 @@ if (window.fetch) {
 
     <div class="panel-head sub">
       <h3>Escrow parameters</h3>
-      <p>Fill in the payment context. The attestation hash, the on-chain style commitment and the exact <code>createEscrow</code> calldata are computed locally.</p>
     </div>
     <div class="grid-2">
       <form id="escrow-form" class="form" autocomplete="off">
@@ -144,7 +185,7 @@ if (window.fetch) {
             <input id="in-deadline" type="number" min="1" step="1" value="24">
           </label>
         </div>
-        <p class="form-hint">Contract address defaults to a placeholder until a deployment exists. Change it and the commitment recomputes.</p>
+        <p class="form-hint">The attestation hash, the on-chain style commitment and the exact <code>createEscrow</code> calldata are computed locally. Contract address defaults to a placeholder until a deployment exists. Change it and the commitment recomputes.</p>
       </form>
       <div class="hash-out">
         <div class="hash-block">
@@ -157,20 +198,20 @@ if (window.fetch) {
         </div>
         <div class="hash-block">
           <span class="hash-label">createEscrow calldata</span>
-          <code class="hash-value wrap" id="out-calldata">-</code>
+          <code class="hash-value brk" id="out-calldata">-</code>
           <div class="btn-row">
             <button class="btn btn-ghost sm" id="btn-copy-calldata" type="button">Copy calldata</button>
           </div>
         </div>
       </div>
     </div>
+    <p class="panel-note">A deterministic additive model rates the receiving scheme. Factors feed the same tier table the contract enforces.</p>
   </section>
 
   <!-- ============ Simulator ============ -->
   <section id="sim" class="panel">
     <div class="panel-head">
       <h2>Escrow state machine simulator</h2>
-      <p>A dependency free mirror of <code>PQPayGuardEscrow.sol</code>. Same branch order, same revert names, same tier gates. The <code>test/</code> suite checks it against real EVM bytecode.</p>
     </div>
 
     <div class="sim-bar">
@@ -287,6 +328,7 @@ if (window.fetch) {
         </table>
       </div>
     </div>
+    <p class="panel-note">A dependency free mirror of <code>PQPayGuardEscrow.sol</code>. Same branch order, same revert names, same tier gates. The <code>test/</code> suite checks it against real EVM bytecode.</p>
   </section>
 
   <!-- ============ Attack playground ============ -->
@@ -488,7 +530,6 @@ if (window.fetch) {
   <section id="network" class="panel">
     <div class="panel-head">
       <h2>QDay Aevum testnet</h2>
-      <p>Read only RPC inspection and wallet helpers. Nothing here runs until you press a button; a failed probe falls back to a clearly marked deterministic simulation.</p>
     </div>
 
     <div class="grid-2">
@@ -534,7 +575,7 @@ if (window.fetch) {
       <tbody>
         <tr><td>network</td><td>QDay Aevum testnet</td><td>chain id <code>44005</code> / <code>0xabe5</code></td></tr>
         <tr><td>rpc</td><td colspan="2"><code>https://rpc-test.qday.info</code></td></tr>
-        <tr><td>tUSD8</td><td colspan="2"><code class="wrap">0x456569838f1d43009A91ebA4263147Afd7233483</code> (6 decimals)</td></tr>
+        <tr><td>tUSD8</td><td colspan="2"><code class="brk">0x456569838f1d43009A91ebA4263147Afd7233483</code> (6 decimals)</td></tr>
         <tr><td>links</td><td colspan="2">
           <a href="https://faucet.qday.info/en" rel="noopener">faucet</a>
           <a href="https://explorer-test.qday.info" rel="noopener">explorer</a>
@@ -542,6 +583,7 @@ if (window.fetch) {
         </td></tr>
       </tbody>
     </table>
+    <p class="panel-note">Read only RPC inspection and wallet helpers. Nothing here runs until you press a button; a failed probe falls back to a clearly marked deterministic simulation.</p>
   </section>
 
   <!-- ============ Docs ============ -->
@@ -602,5 +644,6 @@ if (window.fetch) {
 <script src="src/wallet.js"></script>
 <script src="src/ui.js"></script>
 <script src="src/workbench.js"></script>
+<script src="src/pipeline.js"></script>
 </body>
 </html>

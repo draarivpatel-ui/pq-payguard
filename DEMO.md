@@ -135,7 +135,7 @@ funded beforehand, hashes kept in a text file for instant pasting.
 | 0:15 - 0:40 | `#score`: rsa-2048 + revealed goes critical, ml-dsa-65 goes low; show hashes recompute | Same payment, different release path, bound before funds move. |
 | 0:40 - 1:10 | `#sim`: create session, fund low escrow, instant release; fund critical, release reverts, payer reclaims | The gate is enforced on chain, shown here branch for branch. |
 | 1:10 - 1:30 | `#attacks`: run all six, pan the verdicts | Replay, forgery, leaf reuse, tampering, drain and bypass, all blocked. |
-| 1:30 - 1:45 | `#verify`: run self tests, show the green table | 35 in-page checks; 374 repo tests total. |
+| 1:30 - 1:45 | `#verify`: run self tests, show the green table | 35 in-page checks; 386 repo tests total. |
 | 1:45 - 2:00 | `#network`: probe testnet, show chain id + explorer link | Live on QDay Aevum chain 44005, test tokens only. |
 
 Backup plan if live RPC is slow during the live finalist call: this

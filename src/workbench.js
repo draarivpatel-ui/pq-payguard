@@ -21,6 +21,12 @@
     if (live) live.textContent = msg;
   }
 
+  function emit(source) {
+    try {
+      document.dispatchEvent(new CustomEvent('pqpg:update', { detail: { source: source } }));
+    } catch (e) { /* pipeline also re-renders on its own inputs */ }
+  }
+
   function esc(s) {
     return String(s).replace(/[&<>"']/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
@@ -59,6 +65,7 @@
       card.insertBefore(sum, card.querySelector('.atk-foot'));
     }
     sum.textContent = res.summary;
+    emit('attack');
   }
 
   function runAttack(id) {
@@ -173,11 +180,32 @@
   var signWallet = null;
   var lastReceipt = null;
   var lastVerify = null;
+  var RECEIPT_TREE_HEIGHT = 4;
+  // Last receipt result for the decision pipeline: idle until a real build or verify runs.
+  var receiptState = { state: 'idle', passed: 0, total: 0, leaf: null, tampered: false };
+
+  function noteReceipt(v, extra) {
+    var passed = v.checks.filter(function (c) { return c.ok; }).length;
+    receiptState = Object.assign({
+      state: v.ok ? 'verified' : 'failed', passed: passed, total: v.checks.length,
+      leaf: null, tampered: false
+    }, extra || {});
+    emit('receipt');
+  }
+
+  PQPG.workbench = {
+    attacks: attackResults,
+    receipt: function () {
+      var leaves = Math.pow(2, RECEIPT_TREE_HEIGHT);
+      var used = signWallet ? leaves - signWallet.remaining() : 0;
+      return Object.assign({}, receiptState, { leaves: leaves, used: used });
+    }
+  };
 
   function wallet() {
     if (!signWallet) {
       signWallet = new PQ.HashWallet({
-        height: 4, scheme: 'wots', w: 16,
+        height: RECEIPT_TREE_HEIGHT, scheme: 'wots', w: 16,
         seed: K.keccak256(K.utf8Bytes('pqpg-receipt-wallet'))
       });
     }
@@ -236,6 +264,7 @@
       status.textContent = 'signed on wots leaf ' + rec.signature.leafIndex +
         ' (' + w.remaining() + ' leaves left)';
       status.className = 'net-status ok';
+      noteReceipt(lastVerify, { leaf: rec.signature.leafIndex });
       say('Receipt signed and verified');
     } catch (e) {
       status.textContent = String(e && e.message || e);
@@ -273,6 +302,8 @@
     renderChecks(v.checks);
     status.textContent = v.ok ? 'receipt verified' : 'verification FAILED' + (tamper ? ' (as expected)' : '');
     status.className = 'net-status ' + (v.ok ? 'ok' : 'err');
+    // a pasted receipt may come from another wallet, so its leaf is not marked on this wallet's map
+    noteReceipt(v, { tampered: !!tamper });
     say(v.ok ? 'Receipt verified' : 'Receipt rejected');
   }
 

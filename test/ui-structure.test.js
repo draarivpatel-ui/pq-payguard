@@ -107,3 +107,17 @@ test('UI 13: ui.js ids all still resolve (regression)', () => {
   const missing = [...ids].filter((id) => !html.includes('id="' + id + '"'));
   assert.deepEqual(missing, [], 'ui.js ids missing: ' + missing.join(', '));
 });
+
+test('UI 14: decision pipeline section, stage hooks and script order', () => {
+  for (const id of ['pipeline', 'pipe-decision', 'pipe-defenses', 'pipe-risk', 'pipe-risk-chip',
+    'pipe-cap', 'pipe-cap-chip', 'pipe-escrow', 'pipe-escrow-chip', 'pipe-receipt', 'pipe-receipt-chip']) {
+    assert.ok(html.includes('id="' + id + '"'), 'missing ' + id);
+  }
+  assert.ok(html.indexOf('src/pipeline.js') > html.indexOf('src/workbench.js'), 'pipeline.js must load after workbench.js');
+  assert.ok(html.includes('href="#pipeline"'), 'nav link to the pipeline');
+  // the state publishers the pipeline reads
+  assert.match(ui, /PQPG\.view = \{/);
+  assert.match(workbench, /PQPG\.workbench = \{/);
+  assert.match(ui, /pqpg:update/);
+  assert.match(workbench, /pqpg:update/);
+});

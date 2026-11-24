@@ -21,6 +21,13 @@
     if (live) live.textContent = msg;
   }
 
+  // Tell the decision pipeline (src/pipeline.js) that page state changed.
+  function emit(source) {
+    try {
+      document.dispatchEvent(new CustomEvent('pqpg:update', { detail: { source: source } }));
+    } catch (e) { /* older engines: pipeline re-renders on its own inputs */ }
+  }
+
   function esc(s) {
     return String(s).replace(/[&<>"']/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
@@ -82,6 +89,7 @@
       $('score-num').textContent = '-';
       $('score-tier').textContent = 'invalid';
       $('factor-list').innerHTML = '';
+      emit('score');
       return;
     }
     $('score-num').textContent = String(currentScore.score);
@@ -92,6 +100,7 @@
       return '<li><span>' + esc(f.label) + '</span><b>+' + f.points + '</b></li>';
     }).join('');
     refreshHashes();
+    emit('score');
   }
 
   ['in-scheme', 'in-value', 'in-age', 'in-revealed', 'in-deprecated'].forEach(function (id) {
@@ -165,6 +174,13 @@
     now: SIM_START
   });
   sim.mint(ACTORS.payer, 100_000_000_000n); // demo balance, 100k tUSD8
+
+  // Read only handles for the decision pipeline view.
+  PQPG.view = {
+    sim: sim,
+    actors: ACTORS,
+    score: function () { return currentScore; }
+  };
 
   var actorSel = $('sim-actor');
   var guardianSel = $('ses-guardian');
@@ -307,6 +323,7 @@
         .map(function (k) { return k + '=' + esc(String(a[k])).slice(0, 44); }).join(' ');
       return '<tr><td>' + a.at + '</td><td>' + esc(a.event) + '</td><td>' + detail + '</td></tr>';
     }).join('');
+    emit('sim');
   }
 
   document.addEventListener('click', function (ev) {
