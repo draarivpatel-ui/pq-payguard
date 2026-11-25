@@ -92,11 +92,11 @@ use the wallet buttons. The walkthrough below touches every judging surface in o
    at the Critical row: quarantined, `release()` always reverts. This table
    is the contract, not marketing copy: the same boundaries live in
    `tierOf` in Solidity and in `sim.js`.
-2. **Score a payment** (`#score`). Leave the defaults, then change
-   `Receiving signature scheme` to `rsa-2048` and tick `public key already
-   revealed on chain`. The ring climbs into the 90s and lands on
-   `critical`. Untick the reveal box and switch to `ml-dsa-65`: the same
-   payment drops to `low`.
+2. **Score a payment** (`#score`). Leave the defaults, including the already
+   checked `public key already revealed on chain` box, then change
+   `Receiving signature scheme` to `rsa-2048`. The ring lands on `100`
+   (clamped) at `critical`. Untick the reveal box and switch to `ml-dsa-65`:
+   the same payment drops to `low`.
    Under it, `attestationHash`, `commitmentHash` and the exact
    `createEscrow` calldata recompute live. Change any escrow field and the
    commitment changes, which is the binding property the contract enforces.
@@ -135,7 +135,7 @@ funded beforehand, hashes kept in a text file for instant pasting.
 | 0:15 - 0:40 | `#score`: rsa-2048 + revealed goes critical, ml-dsa-65 goes low; show hashes recompute | Same payment, different release path, bound before funds move. |
 | 0:40 - 1:10 | `#sim`: create session, fund low escrow, instant release; fund critical, release reverts, payer reclaims | The gate is enforced on chain, shown here branch for branch. |
 | 1:10 - 1:30 | `#attacks`: run all six, pan the verdicts | Replay, forgery, leaf reuse, tampering, drain and bypass, all blocked. |
-| 1:30 - 1:45 | `#verify`: run self tests, show the green table | 35 in-page checks; 387 repo tests total. |
+| 1:30 - 1:45 | `#verify`: run self tests, show the green table | 35 in-page checks; 407 repo tests total (297 JS + 110 Foundry). |
 | 1:45 - 2:00 | `#network`: probe testnet, show chain id + explorer link | Live on QDay Aevum chain 44005, test tokens only. |
 
 Backup plan if live RPC is slow during the live finalist call: this

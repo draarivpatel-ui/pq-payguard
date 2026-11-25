@@ -266,6 +266,56 @@ async function auditViewport(width, height, baseUrl) {
     const barPct = await cdp.eval(`document.getElementById('budget-bar').style.width`);
     check(`${tag} budget bar tracks usage`, /9\d(\.\d)?%/.test(barPct), barPct);
 
+    const batchSetup = await cdp.eval(`(() => {
+      const v = PQPG.view;
+      const sim = v.sim;
+      const payer = v.actors.payer;
+      const recipient = v.actors.recipient;
+      const guardian = v.actors.guardian;
+      const att = '0x' + 'ab'.repeat(32);
+      const amount = 100000n;
+      const sid = sim.createSession(payer, {
+        operator: null, guardian,
+        maxPerTx: 500000n, capTotal: 2000000n,
+        expiry: sim.now + 86400, mediumDelay: 900, highDelay: 14400
+      });
+      sim.approve(payer, sim.contractAddress, 2000000n);
+      const deadline = sim.now + 86400;
+      const com = sim.computeCommitment({
+        sessionId: sid, payer, recipient, amountRaw: amount,
+        riskScore: 10, attestationHash: att, deadline
+      });
+      sim.createEscrow(payer, sid, {
+        recipient, amount, riskScore: 10,
+        attestationHash: att, commitmentHash: com, deadline
+      });
+      document.getElementById('btn-warp').click();
+      return {
+        disabled: document.getElementById('btn-batch-rescue').disabled,
+        label: document.getElementById('btn-batch-rescue').textContent
+      };
+    })()`);
+    check(`${tag} batch rescue starts enabled for payer`, batchSetup && batchSetup.disabled === false,
+      batchSetup ? batchSetup.label : 'setup failed');
+    const guardianBatch = await cdp.eval(`(() => {
+      const sel = document.getElementById('sim-actor');
+      sel.value = PQPG.view.actors.guardian;
+      sel.dispatchEvent(new Event('change', { bubbles: true }));
+      const btn = document.getElementById('btn-batch-rescue');
+      return { disabled: btn.disabled, label: btn.textContent };
+    })()`);
+    check(`${tag} batch rescue disables when acting as guardian`, guardianBatch.disabled === true,
+      guardianBatch.label);
+    const payerBatch = await cdp.eval(`(() => {
+      const sel = document.getElementById('sim-actor');
+      sel.value = PQPG.view.actors.payer;
+      sel.dispatchEvent(new Event('change', { bubbles: true }));
+      const btn = document.getElementById('btn-batch-rescue');
+      return { disabled: btn.disabled, label: btn.textContent };
+    })()`);
+    check(`${tag} batch rescue re-enables when acting as payer`, payerBatch.disabled === false,
+      payerBatch.label);
+
     // ---- receipt lifecycle
     await cdp.eval(`document.getElementById('btn-rcpt-build').click()`);
     let digest = null;

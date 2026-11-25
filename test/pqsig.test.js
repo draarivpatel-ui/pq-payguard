@@ -540,6 +540,23 @@ test('PQ 71: detached verify fails closed on bad root input', () => {
   assert.match(r.reason, /root/);
 });
 
+test('PQ 72: detached verify fails closed when an unselected lamport pk half is malformed', () => {
+  const w = newWallet();
+  const b = w.sign(MSG);
+  const leafPk = w.leafPublicKey(b.leafIndex);
+  const unselected = 1 - PQ.digestBit(MSG, 0);
+  leafPk[0][unselected] = new Uint8Array(31);
+  assert.equal(PQ.lamportVerify(leafPk, MSG, b.sig), true);
+  let r;
+  assert.doesNotThrow(() => {
+    r = PQ.verifyDetached(w.root, MSG, {
+      leafIndex: b.leafIndex, scheme: 'lamport', sig: b.sig, proof: b.proof, leafPk
+    });
+  });
+  assert.equal(r.ok, false);
+  assert.match(r.reason, /pk|malformed/);
+});
+
 // ---- toy ECDLP ------------------------------------------------------------------
 
 test('PQ 75: toy curve scalar mul and point add obey group law', () => {

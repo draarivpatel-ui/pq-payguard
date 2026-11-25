@@ -155,6 +155,20 @@
     return true;
   }
 
+  function lamportPkNormalize(pk) {
+    if (!Array.isArray(pk) || pk.length !== 256) return null;
+    const out = new Array(256);
+    for (let i = 0; i < 256; i++) {
+      const pair = pk[i];
+      if (!Array.isArray(pair) || pair.length !== 2) return null;
+      const zero = bytes32OrNull(pair[0]);
+      const one = bytes32OrNull(pair[1]);
+      if (!zero || !one) return null;
+      out[i] = [zero, one];
+    }
+    return out;
+  }
+
   // Compact leaf representation: one 32 byte digest of the whole pk blob.
   function lamportPkDigest(pk) {
     const flat = new Uint8Array(LAMPORT_PK_BYTES);
@@ -540,10 +554,10 @@
       if (!pk) return { ok: false, reason: 'malformed wots signature' };
       leaf = wotsLeafDigest(pk);
     } else {
-      const pk = b.leafPk;
-      if (!Array.isArray(pk) || pk.length !== 256) return { ok: false, reason: 'lamport bundle missing leaf pk' };
+      const pk = lamportPkNormalize(b.leafPk);
+      if (!pk) return { ok: false, reason: 'lamport bundle missing or malformed leaf pk' };
       if (!lamportVerify(pk, msgHash, b.sig)) return { ok: false, reason: 'one time signature invalid' };
-      leaf = lamportPkDigest(pk.map((pair) => pair.map((x) => need32(x, 'pk element'))));
+      leaf = lamportPkDigest(pk);
     }
     let rootBytes;
     try {

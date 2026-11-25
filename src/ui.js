@@ -243,6 +243,7 @@
     actorSel.appendChild(o);
   });
   actorSel.value = ACTORS.payer;
+  actorSel.addEventListener('change', renderSim);
 
   function fillSelect(sel, options, includeNone) {
     sel.innerHTML = '';
