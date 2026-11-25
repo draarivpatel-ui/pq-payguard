@@ -72,10 +72,10 @@ if (window.fetch) {
           <tr><th>Score</th><th>Tier</th><th>Release path</th></tr>
         </thead>
         <tbody>
-          <tr><td><code class="rng">0-29</code></td><td><span class="tier tier-low">low</span></td><td>instant release to recipient</td></tr>
-          <tr><td><code class="rng">30-59</code></td><td><span class="tier tier-med">medium</span></td><td>timelock delay, payer may revoke first</td></tr>
-          <tr><td><code class="rng">60-84</code></td><td><span class="tier tier-high">high</span></td><td>extended timelock plus guardian co-sign</td></tr>
-          <tr><td><code class="rng">85-100</code></td><td><span class="tier tier-crit">critical</span></td><td>quarantined, payer reclaims</td></tr>
+          <tr><td><code class="rng">0-29</code><span class="rail" aria-hidden="true"><i class="tier-low" style="left:0;width:30%"></i></span></td><td><span class="tier tier-low">low</span></td><td>instant release to recipient</td></tr>
+          <tr><td><code class="rng">30-59</code><span class="rail" aria-hidden="true"><i class="tier-med" style="left:30%;width:30%"></i></span></td><td><span class="tier tier-med">medium</span></td><td>timelock delay, payer may revoke first</td></tr>
+          <tr><td><code class="rng">60-84</code><span class="rail" aria-hidden="true"><i class="tier-high" style="left:60%;width:25%"></i></span></td><td><span class="tier tier-high">high</span></td><td>extended timelock plus guardian co-sign</td></tr>
+          <tr><td><code class="rng">85-100</code><span class="rail" aria-hidden="true"><i class="tier-crit" style="left:85%;width:15%"></i></span></td><td><span class="tier tier-crit">critical</span></td><td>quarantined, payer reclaims</td></tr>
         </tbody>
       </table>
       <p class="panel-note">Every tier boundary is enforced by the contract, not by metadata. The commitment hash binds the score before funds move.</p>
@@ -121,7 +121,7 @@ if (window.fetch) {
         <div class="stage-body" id="pipe-receipt"><p class="stage-line">Build and WOTS sign a receipt to drive this stage.</p></div>
       </li>
     </ol>
-    <p class="panel-note">Every stage reads live page state. Stage 1 follows the score the next simulator escrow will commit (the score panel, or the escrow form override). Stage 2 previews the simulator's own <code>createEscrow</code> session, cap, score, deadline, allowance and balance checks in the same order; the authoritative result is the simulator revert it shows after you fund. Stage 3 tracks the latest escrow and its <code>releaseBlocker</code>. Stage 4 shows the last receipt build or verify. The scheme chip classifies the receiving scheme under the score model only: the escrow contract performs no post quantum signatures. Attack rows stay "not run" until you run them.</p>
+    <p class="panel-note">Every stage reads live page state. Stage 2 previews the simulator's own <code>createEscrow</code> checks in the same order; the authoritative result is the revert the simulator shows after you fund. The scheme chip classifies the receiving scheme under the score model only: the escrow contract performs no post quantum signatures.</p>
   </section>
 
   <!-- ============ Risk scoring ============ -->
@@ -148,9 +148,17 @@ if (window.fetch) {
         </div>
       </form>
       <div class="score-out">
-        <div class="score-ring">
-          <span class="score-num" id="score-num">0</span>
-          <span class="score-tier" id="score-tier">low</span>
+        <div class="score-ring" id="score-ring" data-tier="low">
+          <div class="score-read">
+            <span class="score-num" id="score-num">0</span>
+            <span class="score-unit">/ 100</span>
+            <span class="score-tier" id="score-tier">low</span>
+          </div>
+          <div class="meter score-meter" aria-hidden="true">
+            <span class="meter-zone z0"></span><span class="meter-zone z1"></span><span class="meter-zone z2"></span><span class="meter-zone z3"></span>
+            <span class="meter-needle" id="score-needle"></span>
+          </div>
+          <div class="meter-scale" aria-hidden="true"><span>0</span><span style="left:30%">30</span><span style="left:60%">60</span><span style="left:85%">85</span><span style="left:100%">100</span></div>
         </div>
         <ul class="factor-list" id="factor-list"></ul>
       </div>
@@ -393,7 +401,7 @@ if (window.fetch) {
         </div>
       </article>
     </div>
-    <p class="panel-note">Contract paths run through the same PayGuardSim the anvil suite proves against real EVM bytecode; signature paths run through the in page keccak based Lamport, WOTS and merkle constructions. Every verdict below is computed live.</p>
+    <p class="panel-note">Contract paths run through the same PayGuardSim the anvil suite proves against real EVM bytecode; signature paths run through the in page keccak based Lamport, WOTS and merkle constructions. Every verdict here is computed live.</p>
   </section>
 
   <!-- ============ Scheme comparator ============ -->
@@ -627,7 +635,7 @@ if (window.fetch) {
   </section>
 
   <footer class="site-foot">
-    <p>PQ PayGuard runs entirely in this page. The only network call it can make is the one you ask for with the probe button.</p>
+    <p>PQ PayGuard runs entirely in this page. It reaches the network only when you press Probe testnet, Read on chain or a wallet button.</p>
   </footer>
 </main>
 

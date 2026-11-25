@@ -49,6 +49,46 @@
     applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
   });
 
+  // ---- section nav: mark the section under the sticky header ---------------
+
+  var nav = document.querySelector('.head-nav');
+  var navLinks = nav ? Array.prototype.slice.call(nav.querySelectorAll('a[href^="#"]')) : [];
+  var spyTargets = navLinks.map(function (a) { return document.getElementById(a.getAttribute('href').slice(1)); });
+  var spyHead = document.querySelector('.site-head');
+  var spyActive = null;
+  var spyQueued = false;
+  function spy() {
+    spyQueued = false;
+    var line = (spyHead ? spyHead.getBoundingClientRect().bottom : 0) + 40;
+    var idx = -1;
+    for (var k = 0; k < spyTargets.length; k++) {
+      if (spyTargets[k] && spyTargets[k].getBoundingClientRect().top <= line) idx = k;
+    }
+    var doc = document.documentElement;
+    if (idx >= 0 && window.innerHeight + window.scrollY >= doc.scrollHeight - 2) idx = spyTargets.length - 1;
+    var next = idx >= 0 ? navLinks[idx] : null;
+    if (next === spyActive) return;
+    if (spyActive) spyActive.removeAttribute('aria-current');
+    spyActive = next;
+    if (!next) return;
+    next.setAttribute('aria-current', 'location');
+    if (nav.scrollWidth > nav.clientWidth + 1) {
+      var nr = nav.getBoundingClientRect();
+      var lr = next.getBoundingClientRect();
+      nav.scrollLeft += (lr.left + lr.width / 2) - (nr.left + nr.width / 2);
+    }
+  }
+  function queueSpy() {
+    if (spyQueued) return;
+    spyQueued = true;
+    window.requestAnimationFrame(spy);
+  }
+  if (navLinks.length) {
+    window.addEventListener('scroll', queueSpy, { passive: true });
+    window.addEventListener('resize', queueSpy);
+    queueSpy();
+  }
+
   // ---- demo actors -------------------------------------------------------
 
   var ACTORS = {
@@ -88,6 +128,9 @@
       currentScore = null;
       $('score-num').textContent = '-';
       $('score-tier').textContent = 'invalid';
+      $('score-tier').className = 'score-tier';
+      $('score-ring').setAttribute('data-tier', 'invalid');
+      $('score-needle').hidden = true;
       $('factor-list').innerHTML = '';
       emit('score');
       return;
@@ -96,8 +139,14 @@
     var tierEl = $('score-tier');
     tierEl.textContent = currentScore.tierName;
     tierEl.className = 'score-tier ' + currentScore.tierName;
+    $('score-ring').setAttribute('data-tier', currentScore.tierName);
+    var needle = $('score-needle');
+    needle.hidden = false;
+    needle.style.left = Math.max(0, Math.min(100, currentScore.score)) + '%';
     $('factor-list').innerHTML = currentScore.factors.map(function (f) {
-      return '<li><span>' + esc(f.label) + '</span><b>+' + f.points + '</b></li>';
+      var w = Math.max(0, Math.min(100, Number(f.points) || 0));
+      return '<li><span>' + esc(f.label) + '</span><b>+' + f.points + '</b>' +
+        '<i class="factor-bar" aria-hidden="true" style="width:' + w + '%"></i></li>';
     }).join('');
     refreshHashes();
     emit('score');
@@ -219,7 +268,8 @@
   ]);
 
   function actorName(addr) {
-    var n = Object.keys(ACTORS).find(function (k) { return ACTORS[k] === addr; });
+    var low = String(addr || '').toLowerCase();
+    var n = Object.keys(ACTORS).find(function (k) { return ACTORS[k].toLowerCase() === low; });
     return n || CH.shortHash(addr, 8, 6);
   }
 
@@ -298,8 +348,8 @@
         }
         var blockerHtml = blocker
           ? '<div class="esc-blocker">release gate says ' + esc(blocker) + '</div>'
-          : (e.status === 1 ? '<div class="esc-blocker" style="color:var(--good)">gate open, release allowed now</div>' : '');
-        return '<div class="esc-card">' +
+          : (e.status === 1 ? '<div class="esc-blocker open">gate open, release allowed now</div>' : '');
+        return '<div class="esc-card" data-tier="' + tierName + '" data-status="' + statusName + '">' +
           '<div class="esc-card-top">' +
           '<span class="id">escrow ' + id + '</span>' +
           '<span class="tier tier-' + tierName.slice(0, 4) + '">' + tierName + '</span>' +
@@ -320,11 +370,14 @@
     // audit
     $('audit-body').innerHTML = sim.audit.slice(-400).map(function (a) {
       var detail = Object.keys(a).filter(function (k) { return k !== 'event' && k !== 'at'; })
-        .map(function (k) { return k + '=' + esc(String(a[k])).slice(0, 44); }).join(' ');
-      return '<tr><td>' + a.at + '</td><td>' + esc(a.event) + '</td><td>' + detail + '</td></tr>';
+        .map(function (k) {
+          var v = String(a[k]);
+          return '<span class="ak">' + esc(k) + '=</span>' + esc(v.length > 44 ? v.slice(0, 44) + '...' : v);
+        }).join(' ');
+      return '<tr><td>' + a.at + '</td><td class="ev" data-ev="' + esc(a.event) + '">' + esc(a.event) + '</td><td>' + detail + '</td></tr>';
     }).join('');
     var fundedIds = [...sim.escrows.entries()].filter(function (kv) {
-      return kv[1].status === 1 && kv[1].payer === actorSel.value;
+      return kv[1].status === 1 && kv[1].payer === actorSel.value.toLowerCase();
     }).map(function (kv) { return kv[0]; });
     var rescueBtn = $('btn-batch-rescue');
     rescueBtn.disabled = fundedIds.length === 0 || fundedIds.length > 64;
@@ -340,7 +393,7 @@
   $('btn-batch-rescue').addEventListener('click', function () {
     var actor = actorSel.value;
     var ids = [...sim.escrows.entries()].filter(function (kv) {
-      return kv[1].status === 1 && kv[1].payer === actor;
+      return kv[1].status === 1 && kv[1].payer === actor.toLowerCase();
     }).map(function (kv) { return kv[0]; });
     try {
       sim.revokeEscrows(actor, ids);

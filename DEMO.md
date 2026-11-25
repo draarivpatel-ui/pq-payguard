@@ -11,7 +11,7 @@ Public repo: <https://github.com/draarivpatel-ui/pq-payguard>
 ## Deployment status
 
 **Ready for 1-command deploy with the funded testnet wallet.** The contract is
-written, compiled and covered by 100 passing Foundry tests, and the deploy +
+written, compiled and covered by 110 passing Foundry tests, and the deploy +
 verify path is scripted end to end. As of the last update of this file, no
 testnet deployment has been performed yet, so no transaction hashes are
 claimed below. The `Deployment record` table is a template that is filled in
@@ -84,9 +84,9 @@ One end to end flow, as the challenge requires:
 
 ## Live web demo walkthrough
 
-The page at `https://aariv.me/pq-payguard/` runs entirely client side. The
-only network call it can make is the explicit `Probe testnet` button. The
-walkthrough below touches every judging surface in order.
+The page at `https://aariv.me/pq-payguard/` runs entirely client side. It
+reaches the network only when you press `Probe testnet` or `Read on chain`, or
+use the wallet buttons. The walkthrough below touches every judging surface in order.
 
 1. **Hero and the gate.** The landing panel shows the four-tier table. Point
    at the Critical row: quarantined, `release()` always reverts. This table

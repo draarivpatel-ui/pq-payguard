@@ -3,7 +3,8 @@
  * Zero-dependency headless Chromium audit for PQ PayGuard.
  *
  * Launches real Chrome (--headless=new, throwaway profile), drives it over
- * raw CDP through Node's built in WebSocket, and asserts at two viewports:
+ * raw CDP through Node's built in WebSocket, and asserts at desktop, tablet
+ * and phone viewports:
  *
  *   - 0 console errors, 0 uncaught page errors
  *   - 0 external network requests (everything served from 127.0.0.1)
@@ -326,6 +327,7 @@ async function auditViewport(width, height, baseUrl) {
 const srv = await serve();
 try {
   await auditViewport(1440, 900);
+  await auditViewport(820, 1180);
   await auditViewport(390, 844);
 } finally {
   srv.close();

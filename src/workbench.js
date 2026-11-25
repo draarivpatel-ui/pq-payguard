@@ -120,7 +120,7 @@
         '<td>' + r.sigBytes.toLocaleString('en-US') + '</td>' +
         '<td>' + r.pkBytes.toLocaleString('en-US') + '</td>' +
         '<td>' + (r.proofBytes ? r.proofBytes + ' B' : '-') + '</td>' +
-        '<td>' + (r.hashOpsVerify === null ? 'n/a' : r.hashOpsVerify) + '</td>' +
+        '<td>' + (r.hashOpsVerify === null ? 'n/a' : r.hashOpsVerify.toLocaleString('en-US')) + '</td>' +
         '<td>' + r.calldataGas.toLocaleString('en-US') + '</td>' +
         '<td>' + fmtNum(r.execGas) + '</td>' +
         '<td>' + fmtNum(r.onchainGas) + '</td>' +

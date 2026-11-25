@@ -116,13 +116,13 @@ in `DEMO.md`.
 Prerequisites: Node 18+, Foundry (`forge`, `anvil`, `cast`).
 
 ```bash
-# contracts: unit + fuzz + invariant suites (100 tests)
+# contracts: unit + fuzz + invariant suites (110 tests)
 forge test
 
 # javascript: risk, abi, keccak, commitment, simulator, rpc, signing,
 # hash-signature workbench, attack scenarios, receipts, parity vectors,
 # anvil parity against a real EVM, deploy preflight, the decision
-# pipeline view model, and compliance scans (287 tests)
+# pipeline view model, and compliance scans (296 tests)
 npm test
 
 # compile and print artifact facts
@@ -132,9 +132,9 @@ node scripts/compile.mjs
 # deployer balance; prints the exact deploy + verify runbook
 node scripts/qday-preflight.mjs
 
-# headless Chromium audit at 1440x900 and 390x844: console/page errors,
+# headless Chromium audit at 1440x900, 820x1180 and 390x844: console/page errors,
 # external requests, horizontal overflow, all six attacks, comparator,
-# self tests, receipts and bookmarks (72 checks)
+# self tests, receipts and bookmarks (108 checks)
 node scripts/browser-check.mjs
 
 # open the demo (zero dependency static page, works offline)

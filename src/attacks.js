@@ -118,7 +118,7 @@
     step(steps, 'info',
       'a payer-side verbatim replay can only open another escrow to the same bound recipient',
       eid2 === null
-        ? 'replayed call funded id ' + (s.nextEscrowId - 1) + ' - funds stay locked to ' + sh(A.recipient, 10)
+        ? 'replayed call funded id ' + (s.nextEscrowId - 1) + ', funds stay locked to ' + sh(A.recipient, 10)
         : 'unexpected: ' + eid2);
 
     const w = new PQ.HashWallet({ height: 2, seed: K.keccak256(K.utf8Bytes('pqpg-attack-replay')) });
@@ -250,7 +250,7 @@
       id: 'leaf-reuse',
       name: 'One-time key leaf reuse',
       verdict: 'BLOCKED',
-      summary: 'The used leaf bitmap plus the monotonic counter refuse a second spend on a consumed leaf - the exact failure that bleeds Lamport preimages when a stateful wallet is misused.',
+      summary: 'The used leaf bitmap plus the monotonic counter refuse a second spend on a consumed leaf, the exact failure that bleeds Lamport preimages when a stateful wallet is misused.',
       steps
     };
   }
@@ -327,7 +327,7 @@
     const recovered = PQ.toyDlpSolve(G, pub);
     step(steps, recovered === secret ? 'compromised' : 'info',
       'discrete log solved from the exposed pubkey',
-      'recovered key ' + recovered + ' - a classical brute force on a toy curve; ' +
+      'recovered key ' + recovered + ' by classical brute force on a toy curve; ' +
       'Shor\'s algorithm performs this on secp256k1 at full scale on a cryptographically relevant quantum computer');
 
     // PQ PayGuard leg: only the commitment hash is visible pre-creation.
@@ -356,7 +356,7 @@
     }
     step(steps, matched === 0 ? 'protected' : 'info',
       'attacker sweeps all 101 scores under forged attestation preimages',
-      matched + ' candidate commitments collide - the real preimage is hidden inside the hash');
+      matched + ' candidate commitments collide; the real preimage is hidden inside the hash');
 
     const r = code(() => s.createEscrow(A.attacker, sid, {
       recipient: A.attacker, amount: 250_000_000n, riskScore: 5,
