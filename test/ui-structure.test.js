@@ -16,6 +16,7 @@ const ROOT = path.join(__dirname, '..');
 const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
 const workbench = fs.readFileSync(path.join(ROOT, 'src', 'workbench.js'), 'utf8');
 const ui = fs.readFileSync(path.join(ROOT, 'src', 'ui.js'), 'utf8');
+const styles = fs.readFileSync(path.join(ROOT, 'styles.css'), 'utf8');
 
 test('UI 01: all new modules are loaded by script tags', () => {
   for (const mod of ['pqsig.js', 'attacks.js', 'compare.js', 'receipt.js', 'selftest.js', 'workbench.js']) {
@@ -120,4 +121,26 @@ test('UI 14: decision pipeline section, stage hooks and script order', () => {
   assert.match(workbench, /PQPG\.workbench = \{/);
   assert.match(ui, /pqpg:update/);
   assert.match(workbench, /pqpg:update/);
+});
+
+
+test('UI 15: touch target and control contrast regression rules stay pinned', () => {
+  assert.match(styles, /button,[\s\S]*?min-width: 44px/);
+  assert.match(styles, /button,[\s\S]*?min-height: 44px/);
+  assert.match(styles, /\.brand \{[^}]*min-height: 44px/);
+  assert.match(styles, /\.head-nav a[\s\S]*?min-height: 44px/);
+  assert.match(styles, /a\[rel="noopener"\][^}]*min-width: 44px/);
+  assert.match(styles, /\.form input, \.form select, \.net-card input \{[\s\S]*?border: 1px solid var\(--muted\)/);
+});
+
+test('UI 16: print stylesheet hides interactive controls and navigation', () => {
+  assert.match(styles, /@page \{ margin: 12mm; \}/);
+  assert.match(styles, /@media print/);
+  assert.match(styles, /nav, button, input, select, textarea[\s\S]*?display: none !important/);
+});
+
+test('UI 17: print stylesheet uses light paper and avoids split cards', () => {
+  assert.match(styles, /@media print[\s\S]*?background: #fff !important/);
+  assert.match(styles, /\[class\*="card" i\][\s\S]*?break-inside: avoid/);
+  assert.match(styles, /page-break-inside: avoid/);
 });
