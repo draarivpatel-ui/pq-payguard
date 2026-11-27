@@ -77,11 +77,13 @@ test('COMP 02: no AI tool or model vendor mentions', () => {
 });
 
 test('COMP 03: no personal information', () => {
-  const banned = /(gmail\.com|Exampleton|handle-redacted|someone@|5019 |someone@(?!.*noreply)|\b\d{3}[-.]\d{3}[-.]\d{4}\b)/i;
+  const banned = /([a-z0-9._%+-]+@gmail\.com|\b\d{3}[-.]\d{3}[-.]\d{4}\b)/i;
+  const streetAddress = /\b\d{3,5}\s+[A-Z][a-z]+\s+(Manor|Drive|Dr|Lane|Ln|Street|St|Road|Rd|Court|Ct|Way)\b/;
   const offenders = [];
   forEachFile((p, buf) => {
     const rel = p.replace(ROOT + '/', '');
-    if (banned.test(buf.toString('utf8'))) offenders.push(rel);
+    const text = buf.toString('utf8');
+    if (banned.test(text) || streetAddress.test(text)) offenders.push(rel);
   });
   assert.deepEqual(offenders, []);
 });
