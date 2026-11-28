@@ -76,8 +76,16 @@
       this.audit.push(Object.assign({ event: name, at: this.now }, fields));
     }
 
-    setTime(t) { this.now = Math.floor(t); }
-    advanceTime(seconds) { this.now += Math.floor(seconds); }
+    setTime(t) {
+      const n = Number(t);
+      if (!Number.isSafeInteger(n)) throw new TypeError('time must be a safe integer');
+      this.now = n;
+    }
+    advanceTime(seconds) {
+      const n = Number(seconds);
+      if (!Number.isSafeInteger(n)) throw new TypeError('seconds must be a safe integer');
+      this.now += n;
+    }
 
     mint(to, amount) {
       const a = addr(to);
@@ -123,12 +131,19 @@
       const guardian = i.guardian ? addr(i.guardian) : ZERO;
       const maxPerTx = BigInt(i.maxPerTx);
       const capTotal = BigInt(i.capTotal);
-      const expiry = Math.floor(Number(i.expiry));
-      const mediumDelay = Math.floor(Number(i.mediumDelay));
-      const highDelay = Math.floor(Number(i.highDelay));
+      const expiryRaw = Number(i.expiry);
+      const mediumRaw = Number(i.mediumDelay);
+      const highRaw = Number(i.highDelay);
+      if (!Number.isSafeInteger(expiryRaw) || !Number.isSafeInteger(mediumRaw) || !Number.isSafeInteger(highRaw)) {
+        fail('InvalidSessionParams');
+      }
+      const expiry = expiryRaw;
+      const mediumDelay = mediumRaw;
+      const highDelay = highRaw;
 
       if (maxPerTx <= 0n || capTotal < maxPerTx) fail('InvalidSessionParams');
       if (expiry <= this.now) fail('InvalidSessionParams');
+      if (mediumDelay < 0 || highDelay < 0) fail('InvalidSessionParams');
       if (mediumDelay > MAX_DELAY || highDelay > MAX_DELAY || highDelay < mediumDelay) {
         fail('InvalidSessionParams');
       }
@@ -216,7 +231,9 @@
       if (!/^0x[0-9a-f]{64}$/.test(commitmentHash) || commitmentHash === '0x' + '0'.repeat(64)) {
         fail('InvalidHash');
       }
-      const deadline = Math.floor(Number(i.deadline));
+      const deadlineRaw = Number(i.deadline);
+      if (!Number.isSafeInteger(deadlineRaw)) fail('InvalidDeadline');
+      const deadline = deadlineRaw;
       if (deadline <= this.now) fail('InvalidDeadline');
       const expected = this.computeCommitment({
         sessionId: Number(sessionId), payer: s.payer, recipient,

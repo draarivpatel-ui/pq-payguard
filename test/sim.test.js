@@ -70,6 +70,13 @@ test('SIM 02: session rejects invalid parameters', () => {
   assert.equal(bad({ maxPerTx: 1n, capTotal: 1n, expiry: T0 + 1, mediumDelay: 900, highDelay: 800 }), 'InvalidSessionParams');
   assert.equal(bad({ operator: PAYER, maxPerTx: 1n, capTotal: 1n, expiry: T0 + 1, mediumDelay: 0, highDelay: 0 }), 'InvalidSessionParams');
   assert.equal(bad({ guardian: PAYER, maxPerTx: 1n, capTotal: 1n, expiry: T0 + 1, mediumDelay: 0, highDelay: 0 }), 'InvalidSessionParams');
+  for (const field of ['expiry', 'mediumDelay', 'highDelay']) {
+    for (const value of [-1, 1.5, NaN, Infinity]) {
+      const o = { maxPerTx: 1n, capTotal: 1n, expiry: T0 + 1, mediumDelay: 0, highDelay: 0 };
+      o[field] = value;
+      assert.equal(bad(o), 'InvalidSessionParams', field + '=' + value);
+    }
+  }
 });
 
 test('SIM 03: low tier releases instantly to the recipient', () => {
@@ -346,4 +353,17 @@ test('SIM 23: batch revoke validation matches the contract vocabulary', () => {
   assert.throws(() => s.revokeEscrows(PAYER, [a, a]), /DuplicateEscrowId/);
   assert.throws(() => s.revokeEscrows(PAYER, [99]), /EscrowUnknown/);
   assert.throws(() => s.revokeEscrows(RANDO, [a]), /NotPayer/);
+});
+
+test('SIM 24: non-finite deadlines and clock jumps fail closed', () => {
+  const s = newSim();
+  const sid = session(s);
+  const base = escrowInput(s, sid, 10);
+  for (const deadline of [NaN, Infinity, 1.5, 'soon']) {
+    assert.equal(code(() => s.createEscrow(PAYER, sid, Object.assign({}, base, { deadline }))), 'InvalidDeadline');
+  }
+  for (const t of [NaN, Infinity, 1.5]) {
+    assert.throws(() => s.setTime(t), /safe integer/);
+    assert.throws(() => s.advanceTime(t), /safe integer/);
+  }
 });

@@ -122,7 +122,7 @@ forge test
 # javascript: risk, abi, keccak, commitment, simulator, rpc, signing,
 # hash-signature workbench, attack scenarios, receipts, parity vectors,
 # anvil parity against a real EVM, deploy preflight, the decision
-# pipeline view model, and compliance scans (300 tests)
+# pipeline view model, and compliance scans (303 tests)
 npm test
 
 # compile and print artifact facts

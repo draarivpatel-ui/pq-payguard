@@ -144,3 +144,24 @@ test('UI 17: print stylesheet uses light paper and avoids split cards', () => {
   assert.match(styles, /\[class\*="card" i\][\s\S]*?break-inside: avoid/);
   assert.match(styles, /page-break-inside: avoid/);
 });
+
+test('UI 18: documented test counts match the registered suites', () => {
+  const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
+  const files = [...new Set(pkg.scripts.test.match(/test\/[a-z0-9.-]+\.test\.js/g) || [])];
+  assert.ok(files.length >= 15, 'package.json test list too short');
+  let registered = 0;
+  for (const rel of files) {
+    const src = fs.readFileSync(path.join(ROOT, rel), 'utf8');
+    registered += (src.match(/^\s*test\(/gm) || []).length;
+  }
+  const readme = fs.readFileSync(path.join(ROOT, 'README.md'), 'utf8');
+  const demo = fs.readFileSync(path.join(ROOT, 'DEMO.md'), 'utf8');
+  const jsClaim = readme.match(/compliance scans \((\d+) tests\)/);
+  const demoClaim = demo.match(/(\d+) repo tests total \((\d+) JS \+ (\d+) Foundry\)/);
+  assert.ok(jsClaim, 'README must state the JS test count');
+  assert.ok(demoClaim, 'DEMO must state the repo test count');
+  assert.equal(Number(jsClaim[1]), registered, 'README JS count is stale');
+  assert.equal(Number(demoClaim[2]), registered, 'DEMO JS count is stale');
+  assert.equal(Number(demoClaim[1]), Number(demoClaim[2]) + Number(demoClaim[3]),
+    'DEMO total must equal JS + Foundry');
+});

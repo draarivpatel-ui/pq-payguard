@@ -82,7 +82,9 @@
   function exposureScore(input) {
     const i = input || {};
     const scheme = String(i.scheme || 'secp256k1');
-    if (!(scheme in SCHEME_BASE)) throw new TypeError('unknown scheme: ' + scheme);
+    if (!Object.prototype.hasOwnProperty.call(SCHEME_BASE, scheme)) {
+      throw new TypeError('unknown scheme: ' + scheme);
+    }
     const factors = [{ label: 'base ' + scheme, points: SCHEME_BASE[scheme] }];
     let score = SCHEME_BASE[scheme];
 

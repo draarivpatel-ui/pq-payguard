@@ -89,3 +89,9 @@ test('RISK 10: a full risk route can reach each tier', () => {
   assert.equal(R.exposureScore({ scheme: 'rsa-2048' }).tier, 2);
   assert.equal(R.exposureScore({ scheme: 'rsa-2048', keyRevealed: true, deprecated: true }).tier, 3);
 });
+
+test('RISK 11: prototype keys are rejected as unknown schemes', () => {
+  for (const scheme of ['toString', '__proto__', 'constructor', 'hasOwnProperty']) {
+    assert.throws(() => R.exposureScore({ scheme }), /unknown scheme/);
+  }
+});
